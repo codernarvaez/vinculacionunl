@@ -1,0 +1,24 @@
+# Entornos virtuales
+entorno/
+venv/
+.venv/
+env/
+.env
+virtual/
+
+# Archivos de Python
+**/__pycache__/
+*.pyc
+
+# Archivos de distribución
+*.egg-info/
+dist/
+build/
+
+# Otros
+.idea/
+.vscode/
+*.db
+docker-compose.override.yml
+docker-compose.dev.yml
+Dockerfile.dev
