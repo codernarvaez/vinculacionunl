@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-# aqui importar modelos
+from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
 
 Base.metadata.create_all(bind=engine)

@@ -1,0 +1,21 @@
+from sqlalchemy import Column, String, Date, ForeignKey, Enum
+from sqlalchemy.orm import relationship
+from app.models.base_model_orm import BaseModelORM
+from .enums import TipoGenero
+
+class Participante(BaseModelORM):
+    __tablename__ = "participantes"
+
+    nombres = Column(String(100), nullable=False)
+    apellidos = Column(String(100), nullable=False)
+    cedula = Column(String(20), nullable=False, unique=True)
+    fechaNac = Column(Date, nullable=False)
+    genero = Column(Enum(TipoGenero), nullable=False)
+    condicionMedica = Column(String(255))
+    foto = Column(String(255))
+
+    representante_id = Column(ForeignKey("representantes.id"))
+    representante = relationship("Representante", back_populates="participantes")
+
+    escuela_id = Column(ForeignKey("escuelas.id"))
+    escuela = relationship("Escuela", back_populates="participantes")
