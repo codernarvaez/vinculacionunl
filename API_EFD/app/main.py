@@ -1,7 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.controllers.cuenta_controller import cuenta_controller
+from app.controllers.representante_controller import representante_controller
 from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -32,8 +35,8 @@ def read_root():
     return {"RUTA BASE": " API de Escuela de formación deportiva"}
 
 
-#app.include_router(proyecto_controller.router)
-
+app.include_router(representante_controller.router)
+app.include_router(cuenta_controller.router)
 
 def run():
     import uvicorn

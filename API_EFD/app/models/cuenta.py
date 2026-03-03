@@ -9,6 +9,6 @@ class Cuenta(BaseModelORM):
     clave = Column(String(255), nullable=False)
 
     rol_id = Column(ForeignKey("roles.id"), nullable=False)
-    rol = relationship("Rol", back_populates="cuenta")
+    rol = relationship("Rol", back_populates="cuentas")
 
     persona = relationship("Persona", back_populates="cuenta", uselist=False)

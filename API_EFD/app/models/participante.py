@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Date, ForeignKey, Enum
+from sqlalchemy import Column, String, Date, ForeignKey, Enum, Boolean
 from sqlalchemy.orm import relationship
 from app.models.base_model_orm import BaseModelORM
 from .enums import TipoGenero
@@ -13,6 +13,7 @@ class Participante(BaseModelORM):
     genero = Column(Enum(TipoGenero), nullable=False)
     condicionMedica = Column(String(255))
     foto = Column(String(255))
+    acepto_terminos = Column(Boolean, nullable=False)
 
     representante_id = Column(ForeignKey("representantes.id"))
     representante = relationship("Representante", back_populates="participantes")
