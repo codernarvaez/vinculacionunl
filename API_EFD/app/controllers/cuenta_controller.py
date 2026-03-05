@@ -14,12 +14,11 @@ class cuenta_controller:
     @router.post("/login", response_model=api_response[login_response], status_code=status.HTTP_200_OK)
     def login(login_data: login_request, db: Session = Depends(get_db)):
         try:
-            result = cuenta_service.login(db, login_data.correo, login_data.clave)
-            login_response = login_response.model_validate(result)
+            resultado = cuenta_service.login(db, login_data.correo, login_data.clave)
             return api_response(
                 code=status.HTTP_200_OK,
                 msg="Login exitoso",
-                data=login_response
+                data=resultado
             )
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))

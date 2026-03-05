@@ -8,7 +8,7 @@ class representante_request(BaseModel):
     domicilio: str = Field(..., max_length=150)
     acepto_terminos: bool
     correo: EmailStr
-    clave: str
+    clave: str= Field(..., max_length=15, min_length=8)
     cedula: str = Field(..., max_length=12, min_length=10)
 
 

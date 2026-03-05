@@ -11,4 +11,3 @@ class api_response(BaseModel, Generic[T]):
     msg: str
     data: Optional[T] = None
 
-    model_config = ConfigDict(from_attributes=True)

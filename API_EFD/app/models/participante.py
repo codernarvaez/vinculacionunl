@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Date, ForeignKey, Enum, Boolean
 from sqlalchemy.orm import relationship
 from app.models.base_model_orm import BaseModelORM
 from .enums import TipoGenero
+from .inscripciones import inscripciones
 
 class Participante(BaseModelORM):
     __tablename__ = "participantes"
@@ -18,5 +19,8 @@ class Participante(BaseModelORM):
     representante_id = Column(ForeignKey("representantes.id"))
     representante = relationship("Representante", back_populates="participantes")
 
-    escuela_id = Column(ForeignKey("escuelas.id"))
-    escuela = relationship("Escuela", back_populates="participantes")
+    escuelas = relationship(
+        "Escuela", 
+        secondary=inscripciones, 
+        back_populates="participantes"
+    )

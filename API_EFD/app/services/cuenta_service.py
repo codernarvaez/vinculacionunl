@@ -26,13 +26,13 @@ class cuenta_service:
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
-            data={"sub": str(cuenta.id)}, expires_delta=access_token_expires
+            subject=str(cuenta.id)
         )
         
         return {
-            "uuid": str(cuenta.id),
-            "nombre": cuenta.persona.nombre if cuenta.persona else None,
-            "apellido": cuenta.persona.apellido if cuenta.persona else None,
+            "uuid": str(cuenta.uuid),
+            "nombres": cuenta.persona.nombres if cuenta.persona else None,
+            "apellidos": cuenta.persona.apellidos if cuenta.persona else None,
             "rol": cuenta.rol.nombre if cuenta.rol else None,
             "access_token": access_token,
             "token_type": "bearer"
@@ -49,13 +49,18 @@ class cuenta_service:
             user_id: str = payload.get("sub")
             if user_id is None:
                 raise credentials_exception
-            token_data = token_data(id=user_id)
+            
+            # CAMBIO AQUÍ: Usa un nombre diferente a la clase importada
+            # Si importaste 'from ... import token_data', cambia el nombre de la variable
+            current_token_payload = token_data(id=user_id) 
+            
         except JWTError:
             raise credentials_exception
         
-        user = db.query(Cuenta).filter(Cuenta.id == token_data.id).first()
+        # Buscamos al usuario en la base de datos
+        user = db.query(Cuenta).filter(Cuenta.id == current_token_payload.id).first()
+        
         if user is None:
             raise credentials_exception
             
         return user
-

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from app.models.base_model_orm import BaseModelORM
-
+from .inscripciones import inscripciones
 class Escuela(BaseModelORM):
     __tablename__ = "escuelas"
 
@@ -13,4 +13,8 @@ class Escuela(BaseModelORM):
     administrador_id = Column(ForeignKey("administradores.id"))
     administrador = relationship("Administrador", back_populates="escuelas")
 
-    participantes = relationship("Participante", back_populates="escuela")
+    participantes = relationship(
+        "Participante", 
+        secondary=inscripciones, 
+        back_populates="escuelas"
+    )

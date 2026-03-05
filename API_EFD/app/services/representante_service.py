@@ -25,12 +25,6 @@ class represenante_service:
             if not representante_data.acepto_terminos:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Debe aceptar los términos y condiciones")
         
-            if len(representante_data.clave) < 8:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La contraseña debe tener al menos 8 caracteres")
-
-            if len(representante_data.cedula) < 10:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La cédula debe tener al menos 10 caracteres")
-
             representante_data.clave = hash_password(representante_data.clave)
 
             cuenta = Cuenta(

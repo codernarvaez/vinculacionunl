@@ -9,8 +9,8 @@ class login_request(BaseModel):
 
 class login_response(BaseModel):
     uuid: Optional[str] = None
-    nombre: Optional[str] = None
-    apellido: Optional[str] = None
+    nombres: Optional[str] = None
+    apellidos: Optional[str] = None
     rol: Optional[str] = None
     access_token: Optional[str] = None
     token_type: Optional[str] = "bearer"
