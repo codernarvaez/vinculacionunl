@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers.cuenta_controller import cuenta_controller
 from app.controllers.representante_controller import representante_controller
+from app.controllers.administrador_controller import administrador_controller
+from app.controllers.participante_controller import participante_controller
+from app.controllers.escuela_controller import escuela_controller
 from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
 
@@ -37,7 +40,9 @@ def read_root():
 
 app.include_router(representante_controller.router)
 app.include_router(cuenta_controller.router)
-
+app.include_router(administrador_controller.router)
+app.include_router(escuela_controller.router)
+app.include_router(participante_controller.router)
 def run():
     import uvicorn
 
