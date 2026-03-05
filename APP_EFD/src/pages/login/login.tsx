@@ -1,26 +1,38 @@
 import React from 'react';
-import { InputField, PrimaryButton} from '../components/UI';
+import { InputField, PrimaryButton } from '../components/UI';
 // import { Link } from 'react-router-dom';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { methodPOST } from '../../api/access';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface IInitialValue {
-    email: string;
+    correo: string;
     clave: string;
 }
 
 const initialValues: IInitialValue = {
-    email: "",
+    correo: "",
     clave: "",
 };
 
+interface LoginResponse {
+    uuid: string;
+    nombres: string;
+    apellidos: string;
+    rol: string;
+    access_token: string;
+    token_type: string;
+}
 
 const Login: React.FC = () => {
 
+    const navigate = useNavigate();
 
     const loginSchema = yup.object({
-        email: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
+        correo: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
         clave: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres").max(50, "La contraseña no debe exceder los 50 caracteres").required("La contraseña es obligatoria")
     });
 
@@ -29,15 +41,33 @@ const Login: React.FC = () => {
         resolver: yupResolver(loginSchema)
     });
 
-    const onSubmit = async (data: typeof initialValues) => {
+    const onSubmit = async (data: IInitialValue) => {
         try {
-            // Aquí iría la lógica para enviar los datos al backend
-            console.log("Datos del formulario:", data);
+
+            const response = await methodPOST<LoginResponse, IInitialValue>('/cuentas/login', data);
+            console.log(response.msg);
+
+            if (response.code === 200 && response.data) {
+                toast.success(`¡Bienvenido, ${response.data.nombres}!`, {
+                    description: 'Iniciando sesión en UniSports...'
+                });
+                localStorage.setItem('token', response.data.access_token);
+                localStorage.setItem('rol', response.data.rol);
+                localStorage.setItem('uuid', response.data.uuid);
+                navigate('/athletes/dashboard');
+
+            }
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error("Error al iniciar sesión", {
+                    description: error.message
+                });
+            } else {
+                toast.error("Error desconocido al iniciar sesión");
+            }
         }
-        catch (error) {
-            console.error("Error al iniciar sesión:", error);
-        }
-    }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background-dark text-white font-body">
@@ -69,12 +99,12 @@ const Login: React.FC = () => {
 
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             <InputField
-                                {...form.register("email")}
+                                {...form.register("correo")}
                                 label="Correo Electrónico"
-                                id="email"
-                                type="email"
+                                id="correo"
+                                type="correo"
                                 icon="email"
-                                error={form.formState.errors.email?.message}
+                                error={form.formState.errors.correo?.message}
                                 placeholder="usuario@universidad.edu"
                             />
 

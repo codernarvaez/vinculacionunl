@@ -3,6 +3,8 @@ import { InputField, PrimaryButton } from "../components/UI";
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from 'sonner';
+import { methodPOST } from "../../api/access";
 
 const SectionDivider = ({ title }: { title: string }) => (
     <div className="flex items-center my-6">
@@ -21,7 +23,7 @@ interface IRegisterForm {
     correo: string;
     clave: string;
     clave_confirm: string;
-    terms: boolean;
+    acepto_terminos: boolean;
 }
 
 const initialValue: IRegisterForm = {
@@ -33,7 +35,7 @@ const initialValue: IRegisterForm = {
     correo: "",
     clave: "",
     clave_confirm: "",
-    terms: false,
+    acepto_terminos: false,
 };
 
 
@@ -48,9 +50,17 @@ const registerForm = yup.object({
     clave_confirm: yup.string()
         .oneOf([yup.ref('clave')], 'Las contraseñas no coinciden')
         .required("Confirma tu contraseña"),
-    terms: yup.boolean().required("Debes aceptar los términos").oneOf([true],"Debes aceptar los términos"),
+    acepto_terminos: yup.boolean().required("Debes aceptar los términos").oneOf([true], "Debes aceptar los términos"),
 }).required();
 
+
+interface RegisterResponse {
+    nombres: string;
+    apellidos: string;
+    cedula: string;
+    contacto: string;
+    domicilio: string;
+}
 
 
 
@@ -64,8 +74,31 @@ const Register: React.FC = () => {
     });
 
     const onSubmit = async (data: IRegisterForm) => {
-        console.log("Formulario válido:", data);
-    };
+        try {
+            const response = await methodPOST<RegisterResponse, IRegisterForm>('/representantes', data);
+            console.log(response.msg);
+
+            if (response.code === 201 && response.data) {
+                toast.success(`¡Registro exitoso, ${response.data.nombres}!`, {
+                    description: 'Puedes iniciar sesión con tu nueva cuenta.'
+                });
+                form.reset();
+            } else {
+                toast.error("Error desconocido al registrar");
+            }
+
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error("Error al registrar", {
+                    description: error.message
+                });
+            } else {
+                toast.error("Error desconocido al registrar");
+            }
+
+        };
+    }
+
 
 
     return (
@@ -156,12 +189,12 @@ const Register: React.FC = () => {
 
                                 <div className="flex items-center gap-2">
                                     <input
-                                        {...form.register("terms")}
+                                        {...form.register("acepto_terminos")}
                                         type="checkbox"
-                                        id="terms"
+                                        id="acepto_terminos"
                                         className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary focus:ring-offset-gray-900 transition-colors"
                                     />
-                                    <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer select-none">
+                                    <label htmlFor="acepto_terminos" className="text-xs text-gray-400 cursor-pointer select-none">
                                         Acepto los <span className="text-white">términos y condiciones</span> de la UNL.
                                     </label>
                                     <Link to="#" className="text-xs text-primary hover:underline ml-auto font-medium">
@@ -169,9 +202,9 @@ const Register: React.FC = () => {
                                     </Link>
                                 </div>
 
-                                {form.formState.errors.terms && (
+                                {form.formState.errors.acepto_terminos && (
                                     <p className="text-[10px] text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
-                                        {form.formState.errors.terms.message}
+                                        {form.formState.errors.acepto_terminos.message}
                                     </p>
                                 )}
                             </div>
