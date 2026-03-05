@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import { InputField, PrimaryButton } from "../components/UI";
+import * as yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 const SectionDivider = ({ title }: { title: string }) => (
     <div className="flex items-center my-6">
@@ -9,19 +12,66 @@ const SectionDivider = ({ title }: { title: string }) => (
     </div>
 );
 
+interface IRegisterForm {
+    nombres: string;
+    apellidos: string;
+    cedula: string;
+    domicilio: string;
+    contacto: string;
+    correo: string;
+    clave: string;
+    clave_confirm: string;
+    terms: boolean;
+}
+
+const initialValue: IRegisterForm = {
+    nombres: "",
+    apellidos: "",
+    cedula: "",
+    domicilio: "",
+    contacto: "",
+    correo: "",
+    clave: "",
+    clave_confirm: "",
+    terms: false,
+};
+
+
+const registerForm = yup.object({
+    nombres: yup.string().required("El nombre es obligatorio").min(3, "Mínimo 3 caracteres").max(50, "Máximo 50 caracteres"),
+    apellidos: yup.string().required("Los apellidos son obligatorios").min(3, "Mínimo 3 caracteres").max(50, "Máximo 50 caracteres"),
+    cedula: yup.string().required("La cédula es obligatoria").matches(/^[0-9]+$/, "Solo números").min(10, "Mínimo 10 dígitos").max(10, "Máximo 10 dígitos"),
+    domicilio: yup.string().required("El domicilio es obligatorio").min(5, "Mínimo 5 caracteres").max(125, "Máximo 125 caracteres"),
+    contacto: yup.string().required("El teléfono es obligatorio").min(9, "Mínimo 9 dígitos").max(15, "Máximo 15 dígitos").matches(/^[0-9]+$/, "Solo números"),
+    correo: yup.string().email("Correo inválido").required("El correo es obligatorio").max(100, "Máximo 100 caracteres"),
+    clave: yup.string().min(8, "Mínimo 8 caracteres").required("La contraseña es obligatoria").max(50, "Máximo 50 caracteres"),
+    clave_confirm: yup.string()
+        .oneOf([yup.ref('clave')], 'Las contraseñas no coinciden')
+        .required("Confirma tu contraseña"),
+    terms: yup.boolean().required("Debes aceptar los términos").oneOf([true],"Debes aceptar los términos"),
+}).required();
+
+
+
+
 // --- Componente Principal ---
 
 const Register: React.FC = () => {
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(e.currentTarget));
-        console.log("Registro:", data);
+
+    const form = useForm<IRegisterForm>({
+        defaultValues: initialValue,
+        resolver: yupResolver(registerForm),
+    });
+
+    const onSubmit = async (data: IRegisterForm) => {
+        console.log("Formulario válido:", data);
     };
+
 
     return (
         <div className="min-h-screen bg-background-dark flex flex-col">
             {/* Navbar */}
-            <nav className="w-full bg-surface-dark border-b border-gray-800 sticky top-0 z-50">
+            {/* <nav className="w-full bg-surface-dark border-b border-gray-800 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <span className="material-icons text-primary text-3xl">sports_soccer</span>
@@ -32,7 +82,7 @@ const Register: React.FC = () => {
                         <a href="#" className="text-sm text-primary font-medium">Iniciar Sesión</a>
                     </div>
                 </div>
-            </nav>
+            </nav> */}
 
             <main className="flex-grow flex items-center justify-center p-4 relative">
                 {/* Decoración de fondo */}
@@ -80,33 +130,64 @@ const Register: React.FC = () => {
                             <p className="text-gray-400 text-sm">Formulario para representantes legales de los deportistas</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <SectionDivider title="Datos de Identidad" />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputField label="Nombres" id="nombres" icon="badge" placeholder="Ej. Juan Pérez" />
-                                <InputField label="Cédula" id="cedula" icon="fingerprint" placeholder="1712345678" />
+                                <InputField {...form.register("nombres")} error={form.formState.errors.nombres?.message} label="Nombres" id="nombres" icon="badge" placeholder="Ej. Juan Pérez" />
+                                <InputField {...form.register("apellidos")} error={form.formState.errors.apellidos?.message} label="Apellidos" id="apellidos" icon="badge" placeholder="Ej. Gómez" />
                             </div>
-
-                            <InputField label="Domicilio" id="domicilio" icon="home" placeholder="Sector y calle principal" />
-                            <InputField label="Teléfono" id="contacto" icon="phone" placeholder="09XXXXXXXX" type="tel" />
-
-                            <SectionDivider title="Credenciales" />
-                            <InputField label="Correo Electrónico" id="correo" icon="email" placeholder="usuario@correo.com" type="email" />
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputField label="Contraseña" id="clave" icon="lock" placeholder="••••••••" type="password" />
-                                <InputField label="Confirmar" id="clave_confirm" icon="lock_reset" placeholder="••••••••" type="password" />
+                                <InputField {...form.register("cedula")} error={form.formState.errors.cedula?.message} label="Cédula" id="cedula" icon="fingerprint" placeholder="1712345678" />
+                                <InputField {...form.register("domicilio")} error={form.formState.errors.domicilio?.message} label="Domicilio" id="domicilio" icon="home" placeholder="Sector y calle principal" />
                             </div>
 
-                            <div className="flex items-center gap-2 py-2">
-                                <input type="checkbox" id="terms" className="rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary" />
-                                <label htmlFor="terms" className="text-xs text-gray-400">Acepto los términos y condiciones de la UNL.</label>
-                                <Link to="#" className="text-xs text-primary hover:underline ml-auto">Leer términos</Link>
+
+                            <InputField {...form.register("contacto")} error={form.formState.errors.contacto?.message} label="Teléfono" id="contacto" icon="phone" placeholder="09XXXXXXXX" type="tel" />
+
+                            <SectionDivider title="Credenciales" />
+                            <InputField {...form.register("correo")} error={form.formState.errors.correo?.message} label="Correo Electrónico" id="correo" icon="email" placeholder="usuario@correo.com" type="email" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <InputField {...form.register("clave")} error={form.formState.errors.clave?.message} label="Contraseña" id="clave" icon="lock" placeholder="••••••••" type="password" />
+                                <InputField {...form.register("clave_confirm")} error={form.formState.errors.clave_confirm?.message} label="Confirmar" id="clave_confirm" icon="lock_reset" placeholder="••••••••" type="password" />
                             </div>
+
+                            <div className="flex flex-col gap-1 py-2">
+
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        {...form.register("terms")}
+                                        type="checkbox"
+                                        id="terms"
+                                        className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary focus:ring-offset-gray-900 transition-colors"
+                                    />
+                                    <label htmlFor="terms" className="text-xs text-gray-400 cursor-pointer select-none">
+                                        Acepto los <span className="text-white">términos y condiciones</span> de la UNL.
+                                    </label>
+                                    <Link to="#" className="text-xs text-primary hover:underline ml-auto font-medium">
+                                        Leer términos
+                                    </Link>
+                                </div>
+
+                                {form.formState.errors.terms && (
+                                    <p className="text-[10px] text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
+                                        {form.formState.errors.terms.message}
+                                    </p>
+                                )}
+                            </div>
+
+
 
                             <PrimaryButton type="submit">
                                 Completar Registro
                             </PrimaryButton>
+
+                            <div className="text-end">
+                                <p className="text-sm text-gray-400">
+                                    ¿Ya tienes cuenta? <a href="/login" className="text-primary font-bold hover:text-primary-hover transition-colors ml-1 uppercase">Inicia Sesión</a>
+                                </p>
+                            </div>
+
                         </form>
                     </div>
                 </div>
