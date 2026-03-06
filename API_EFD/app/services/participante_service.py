@@ -5,6 +5,9 @@ from app.models.escuela import Escuela
 from app.models.inscripciones import inscripciones
 from fastapi import HTTPException, status
 from datetime import date
+import os
+import uuid
+import shutil
 
 class participante_service:
 
@@ -12,6 +15,17 @@ class participante_service:
 
     def inscribir_participante_a_escuela(db: Session, participante_data):
         try:
+            UPLOAD_DIR = "public/uploads"
+            if not os.path.exists(UPLOAD_DIR):
+                os.makedirs(UPLOAD_DIR)
+
+            file_extension = os.path.splitext(participante_data.foto.filename)[1]
+            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            file_path = os.path.join(UPLOAD_DIR, unique_filename)
+
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(participante_data.foto.file, buffer)
+
             representante_uuid_str = str(participante_data.representante_uuid)
 
             representante = db.query(Representante).filter(
@@ -20,7 +34,7 @@ class participante_service:
 
             if not representante:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Representante no encontrado")
-            
+
             participante = Participante(
                 nombres=participante_data.nombres,
                 apellidos=participante_data.apellidos,
@@ -28,7 +42,7 @@ class participante_service:
                 fechaNac=participante_data.fechaNac,
                 genero=participante_data.genero,
                 condicionMedica=participante_data.condicionMedica,
-                foto=participante_data.foto,
+                foto=file_path,
                 acepto_terminos=participante_data.acepto_terminos,
                 representante_id=representante.id
             )
@@ -79,6 +93,8 @@ class participante_service:
             stmt = inscripciones.insert().values(participante_id=participante.id, escuela_id=escuela.id)
             db.execute(stmt)
             db.commit()
+
+            return participante
         except Exception as e:
             db.rollback()
             print(f"Log del error: {e}")

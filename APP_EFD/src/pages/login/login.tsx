@@ -54,6 +54,7 @@ const Login: React.FC = () => {
                 localStorage.setItem('token', response.data.access_token);
                 localStorage.setItem('rol', response.data.rol);
                 localStorage.setItem('uuid', response.data.uuid);
+                localStorage.setItem('nombres', response.data.nombres + " " + response.data.apellidos)
                 navigate('/athletes/dashboard');
 
             }

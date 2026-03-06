@@ -30,21 +30,31 @@ export async function methodGET<T>(endpoint: string): Promise<T> {
 }
 
 export async function methodPOST<T, D = unknown>(endpoint: string, data: D): Promise<ApiResponse<T>> {
+    const isFormData = data instanceof FormData;
+
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: {
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+            // 'Authorization': `Bearer ${localStorage.getItem('token')}` 
+        },
+        body: isFormData ? (data as unknown as BodyInit) : JSON.stringify(data),
     });
 
     const result = await response.json();
 
+    console.log("Response from POST:", result);
+
     if (!response.ok) {
         const errorData: ApiError = result;
+        if (Array.isArray(errorData.detail)) {
+            const messages = errorData.detail.map((err: any) => `${err.loc.join('.')}: ${err.msg}`).join(', ');
+            throw new Error(messages);
+        }
         throw new Error(errorData.detail || `Error POST: ${response.statusText}`);
     }
     return result as ApiResponse<T>;
 }
-
 export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PUT',

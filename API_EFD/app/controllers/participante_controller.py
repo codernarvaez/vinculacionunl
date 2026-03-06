@@ -4,14 +4,50 @@ from app.core.get_db import get_db
 from app.services.participante_service import participante_service
 from app.schemas.response_schema import api_response
 from app.schemas.participante_schema import participante_request, participante_response
+from datetime import date
+from uuid import UUID
+from fastapi import UploadFile, File, Form
+from app.models.participante import TipoGenero
+from typing import Optional
+
 class participante_controller:
     router = APIRouter(prefix="/participantes", tags=["Participantes"])
 
     @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[participante_response])
-    def inscribir_participante_a_escuela(participante_data: participante_request, db: Session = Depends(get_db)):
+    def inscribir_participante_a_escuela(
+        nombres: str = Form(...),
+        apellidos: str = Form(...),
+        cedula: str = Form(...),
+        fechaNac: date = Form(...),
+        genero: TipoGenero = Form(...),
+        acepto_terminos: str = Form(...),
+        representante_uuid: UUID = Form(...),
+        escuela_uuid: UUID = Form(...),
+        condicionMedica: Optional[str] = Form(None),
+        foto: UploadFile = File(...),
+        db: Session = Depends(get_db)
+    ):
         try:
-           nuevo_participante = participante_service.inscribir_participante_a_escuela(db, participante_data)
-           return api_response(
+            val_acepto = acepto_terminos.lower() in ['true', '1', 'yes']
+            data_dict = {
+                "nombres": nombres,
+                "apellidos": apellidos,
+                "cedula": cedula,
+                "fechaNac": fechaNac,
+                "genero": genero,
+                "acepto_terminos": val_acepto,
+                "representante_uuid": representante_uuid,
+                "escuela_uuid": escuela_uuid,
+                "condicionMedica": condicionMedica,
+                "foto": foto
+            }
+            
+            from types import SimpleNamespace
+            participante_data = SimpleNamespace(**data_dict)
+
+            nuevo_participante = participante_service.inscribir_participante_a_escuela(db, participante_data)
+            
+            return api_response(
                 code=status.HTTP_201_CREATED,
                 msg="Participante inscrito exitosamente",
                 data=nuevo_participante
@@ -19,8 +55,9 @@ class participante_controller:
         except HTTPException as e:
             raise e
         except Exception as e:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
-    
+            print(f"Error detallado: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
+        
     @router.get("/{participante_uuid}", response_model=api_response[participante_response], status_code=status.HTTP_200_OK)
     def obtener_participante(participante_uuid: str, db: Session = Depends(get_db)):
         try:

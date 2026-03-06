@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { Link } from 'react-router-dom';
 // --- Interfaces ---
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -44,29 +44,71 @@ export const PrimaryButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElemen
   </button>
 );
 
-
-export const SelectField: React.FC<React.SelectHTMLAttributes<HTMLSelectElement> & { label: string, options: {value: string, label: string}[] }> = ({ label, id, options, ...props }) => (
-  <div className="space-y-1.5 w-full text-left">
-    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider" htmlFor={id}>{label}</label>
-    <select
-      id={id}
-      {...props}
-      className="block w-full px-3 py-2.5 border border-gray-800 rounded bg-input-dark text-white focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-200"
-    >
-      <option value="" disabled>Seleccione una opción</option>
-      {options.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
-    </select>
-  </div>
+export const DangerButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }> = ({ children, className = "", ...props }) => (
+  <button
+    {...props}
+    className={`px-6 py-2.5 rounded border border-red-500 text-red-500 font-bold uppercase text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95 ${className}`}
+  >
+    {children}
+  </button>
 );
 
-export const TextAreaField: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string }> = ({ label, id, ...props }) => (
+export const SelectField: React.FC<{
+  label: string;
+  id: string;
+  options: { value: string | number; label: string }[];
+  error?: string;
+  className?: string;
+  [key: string]: unknown;
+}> = ({ label, id, options, error, className = "", ...props }) => (
+  <div className={`space-y-1.5 w-full text-left ${className}`}>
+    <label htmlFor={id} className="text-xs font-bold text-gray-400 uppercase tracking-wider ml-1">
+      {label}
+    </label>
+    <div className="relative group">
+      <select
+        id={id}
+        name={id}
+        {...props}
+        className={`block w-full px-3 py-2.5 border ${
+          error ? "border-red-500" : "border-gray-800"
+        } rounded bg-input-dark text-white text-sm outline-none focus:ring-1 focus:ring-primary focus:border-primary transition duration-200 appearance-none cursor-pointer hover:bg-opacity-80`}
+      >
+        <option value="" className="bg-surface-dark">Seleccionar...</option>
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value} className="bg-surface-dark text-white">
+            {opt.label}
+          </option>
+        ))}
+      </select>
+      
+      <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg group-focus-within:text-primary transition-colors">
+        expand_more
+      </span>
+
+      {error && (
+        <div className="absolute mt-1 text-[10px] font-bold text-red-500">
+          {error}
+        </div>
+      )}
+    </div>
+  </div>
+);
+export const TextAreaField: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string, error?: string }> = ({ label, id, error,  ...props }) => (
   <div className="space-y-1.5 w-full text-left">
     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider" htmlFor={id}>{label}</label>
     <textarea
       id={id}
       {...props}
-      className="block w-full px-3 py-2.5 border border-gray-800 rounded bg-input-dark text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-200"
+      className={`block w-full px-3 py-2.5 border ${
+        error ? "border-red-500" : "border-gray-800"
+      } rounded bg-input-dark text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-200`}
     />
+    {error && (
+      <div className="text-[10px] font-bold text-red-500 mt-1">
+        {error}
+      </div>
+    )}
   </div>
 );
 
@@ -116,9 +158,10 @@ interface ParticipantProps {
   status: 'Activo' | 'Pendiente';
   img: string;
   gradient: string;
+  uuid_participante: string;
 }
 
-export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender, school, condition, status, img, gradient }) => (
+export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender, school, condition, status, uuid_participante, img, gradient }) => (
   <div className="bg-surface-dark rounded-xl border border-gray-800 shadow-sm hover:border-primary/50 transition-all duration-300 group flex flex-col h-full overflow-hidden">
     <div className={`relative h-24 bg-gradient-to-r ${gradient}`}>
       <div className={`absolute top-3 right-3 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] font-bold uppercase border ${status === 'Activo' ? 'bg-green-500/20 text-primary border-primary/30' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'}`}>
@@ -151,9 +194,9 @@ export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender,
       </div>
     </div>
     <div className="p-4 pt-0 mt-auto flex flex-col gap-2">
-      <button className="w-full py-2 bg-primary hover:bg-emerald-600 text-black font-bold rounded text-xs uppercase transition-colors">
+      <Link to={`/athletes/detail/${uuid_participante}`} className="w-full py-2 bg-primary hover:bg-emerald-600 text-black font-bold rounded text-xs uppercase transition-colors justify-center items-center text-center">
         Ver Detalles
-      </button>
+      </Link>
       <button className="w-full py-2 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-white rounded text-xs uppercase transition-colors flex justify-center items-center gap-2">
         <span className="material-icons-outlined text-sm">picture_as_pdf</span>
         Carnet PDF
@@ -198,3 +241,5 @@ export const DetailItem = ({ label, value, icon }: { label: string, value: strin
     </dd>
   </div>
 );
+
+

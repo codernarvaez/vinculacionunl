@@ -9,7 +9,7 @@ class Participante(BaseModelORM):
 
     nombres = Column(String(100), nullable=False)
     apellidos = Column(String(100), nullable=False)
-    cedula = Column(String(20), nullable=False, unique=True)
+    cedula = Column(String(20), nullable=False)
     fechaNac = Column(Date, nullable=False)
     genero = Column(Enum(TipoGenero), nullable=False)
     condicionMedica = Column(String(255))

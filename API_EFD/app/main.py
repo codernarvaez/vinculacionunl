@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from app.controllers.cuenta_controller import cuenta_controller
 from app.controllers.representante_controller import representante_controller
@@ -37,6 +38,8 @@ app.add_middleware(
 def read_root():
     return {"RUTA BASE": " API de Escuela de formación deportiva"}
 
+
+app.mount("/public", StaticFiles(directory="public"), name="public")
 
 app.include_router(representante_controller.router)
 app.include_router(cuenta_controller.router)

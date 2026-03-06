@@ -30,7 +30,7 @@ class cuenta_service:
         )
         
         return {
-            "uuid": str(cuenta.uuid),
+            "uuid": str(cuenta.persona.uuid),
             "nombres": cuenta.persona.nombres if cuenta.persona else None,
             "apellidos": cuenta.persona.apellidos if cuenta.persona else None,
             "rol": cuenta.rol.nombre if cuenta.rol else None,

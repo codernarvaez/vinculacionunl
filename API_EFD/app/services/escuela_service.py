@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.escuela import Escuela
 from app.models.administrador import Administrador
+from datetime import date
 
 from fastapi import HTTPException, status
 class escuela_service:
@@ -39,6 +40,21 @@ class escuela_service:
     def listar_escuelas_disponibles(db: Session):
         try:
             escuelas = db.query(Escuela).filter(Escuela.estado == True).all()
+            return escuelas
+        except Exception as e:
+            print(f"Log del error: {e}")
+            raise e
+    
+    #listar escuelas disponibles en base a una fecha de nacimiento
+    def listar_escuelas_por_fecha_nacimiento(db: Session, fecha_nac):
+        try:
+            edad_participante = (date.today() - fecha_nac).days // 365
+            
+            escuelas = db.query(Escuela).filter(
+                Escuela.estado == True,
+                Escuela.ranInferior <= edad_participante,
+                Escuela.ranSuperior >= edad_participante
+            ).all()
             return escuelas
         except Exception as e:
             print(f"Log del error: {e}")
