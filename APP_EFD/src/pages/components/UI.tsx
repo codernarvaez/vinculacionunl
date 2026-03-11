@@ -134,19 +134,21 @@ export const StatCard = ({ icon, label, value, colorClass }: { icon: string, lab
 );
 
 // --- Item del Menú Lateral ---
-export const SidebarItem = ({ icon, label, active = false }: { icon: string, label: string, active?: boolean }) => (
-  <a href="#" className={`
-    group flex items-center px-4 py-3 rounded-lg transition-all duration-200
+export const SidebarItem = ({ icon, label, active = false, onClick }: { icon: string, label: string, active?: boolean, onClick?: () => void }) => (
+  <button 
+    onClick={onClick}
+    className={`
+    w-full group flex items-center px-4 py-3 rounded-lg transition-all duration-200
     ${active 
       ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]' 
-      : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200'}
+      : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 border border-transparent'}
   `}>
     <span className={`material-icons-outlined mr-3 transition-colors ${active ? 'text-primary' : 'text-gray-500 group-hover:text-gray-300'}`}>
       {icon}
     </span>
     <span className="font-medium text-sm tracking-wide">{label}</span>
     {active && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_8px_#22c55e]"></div>}
-  </a>
+  </button>
 );
 
 interface ParticipantProps {
@@ -159,9 +161,10 @@ interface ParticipantProps {
   img: string;
   gradient: string;
   uuid_participante: string;
+  onDownloadPdf?: () => void;
 }
 
-export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender, school, condition, status, uuid_participante, img, gradient }) => (
+export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender, school, condition, status, uuid_participante, img, gradient, onDownloadPdf }) => (
   <div className="bg-surface-dark rounded-xl border border-gray-800 shadow-sm hover:border-primary/50 transition-all duration-300 group flex flex-col h-full overflow-hidden">
     <div className={`relative h-24 bg-gradient-to-r ${gradient}`}>
       <div className={`absolute top-3 right-3 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] font-bold uppercase border ${status === 'Activo' ? 'bg-green-500/20 text-primary border-primary/30' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'}`}>
@@ -197,7 +200,10 @@ export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender,
       <Link to={`/athletes/detail/${uuid_participante}`} className="w-full py-2 bg-primary hover:bg-emerald-600 text-black font-bold rounded text-xs uppercase transition-colors justify-center items-center text-center">
         Ver Detalles
       </Link>
-      <button className="w-full py-2 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-white rounded text-xs uppercase transition-colors flex justify-center items-center gap-2">
+      <button 
+        onClick={onDownloadPdf}
+        className="w-full py-2 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-white rounded text-xs uppercase transition-colors flex justify-center items-center gap-2"
+      >
         <span className="material-icons-outlined text-sm">picture_as_pdf</span>
         Carnet PDF
       </button>
@@ -243,3 +249,108 @@ export const DetailItem = ({ label, value, icon }: { label: string, value: strin
 );
 
 
+
+// --- Table Components ---
+export const Table = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <div className={`w-full overflow-x-auto rounded-xl border border-gray-800 shadow-sm ${className}`}>
+    <table className="w-full text-left border-collapse">
+      {children}
+    </table>
+  </div>
+);
+
+export const TableHead = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <thead className={`bg-black/40 border-b border-gray-800 text-[10px] uppercase font-black tracking-widest text-gray-400 ${className}`}>
+    <tr>{children}</tr>
+  </thead>
+);
+
+export const TableBody = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <tbody className={`divide-y divide-gray-800/50 bg-surface-dark ${className}`}>
+    {children}
+  </tbody>
+);
+
+export const TableRow = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => (
+  <tr className={`hover:bg-gray-800/20 transition-colors group ${className}`}>
+    {children}
+  </tr>
+);
+
+export const TableCell = ({ children, className = "", header = false }: { children: React.ReactNode, className?: string, header?: boolean }) => {
+  const Tag = header ? 'th' : 'td';
+  return (
+    <Tag className={`px-6 py-4 whitespace-nowrap ${header ? 'font-black' : 'text-sm text-gray-300 font-medium'} ${className}`}>
+      {children}
+    </Tag>
+  );
+};
+
+// --- Badge Component ---
+export const Badge = ({ children, variant = "primary", className = "" }: { children: React.ReactNode, variant?: "primary" | "success" | "warning" | "danger" | "neutral", className?: string }) => {
+  const variants = {
+    primary: "bg-primary/20 text-primary border-primary/30",
+    success: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    warning: "bg-yellow-500/20 text-yellow-500 border-yellow-500/30",
+    danger: "bg-red-500/20 text-red-500 border-red-500/30",
+    neutral: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+  };
+  return (
+    <span className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border tracking-wider ${variants[variant]} ${className}`}>
+      {children}
+    </span>
+  );
+};
+
+// --- Icon Button ---
+export const IconButton = ({ icon, onClick, className = "", title, variant = "neutral" }: { icon: string, onClick?: () => void, className?: string, title?: string, variant?: "primary" | "danger" | "neutral" }) => {
+  const variants = {
+    primary: "text-primary hover:bg-primary/10 hover:border-primary/30 border-transparent",
+    danger: "text-red-500 hover:bg-red-500/10 hover:border-red-500/30 border-transparent",
+    neutral: "text-gray-400 hover:text-white hover:bg-gray-800 border-transparent",
+  };
+  return (
+    <button 
+      onClick={onClick}
+      title={title}
+      className={`p-2 rounded-lg border transition-all duration-200 flex items-center justify-center ${variants[variant]} ${className}`}
+    >
+      <span className="material-icons-outlined text-[20px]">{icon}</span>
+    </button>
+  );
+};
+
+// --- Modal Component ---
+export const Modal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  children: React.ReactNode;
+}> = ({ isOpen, onClose, title, children }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div 
+        className="bg-[#0d0f12] border border-gray-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-black/20">
+          <h3 className="text-lg font-display font-bold text-white uppercase tracking-tight flex items-center gap-2">
+            <span className="w-1 h-5 bg-primary rounded-full"></span>
+            {title}
+          </h3>
+          <button 
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"
+          >
+            <span className="material-icons">close</span>
+          </button>
+        </div>
+        <div className="p-6">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};

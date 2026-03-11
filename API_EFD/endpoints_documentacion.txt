@@ -1,0 +1,151 @@
+DOCUMENTACIÓN DE NUEVOS ENDPOINTS API EFD
+========================================
+
+Este documento detalla los endpoints REST creados para la gestión de Cuentas, Escuelas, Participantes y Personas, incluyendo sus rutas, parámetros de consulta (query params), modelos de cuerpo de petición (body) y respuestas esperadas.
+
+Todas las respuestas exitosas de la API están envueltas en el formato estándar `api_response`:
+{
+    "code": 200,
+    "msg": "Mensaje de éxito",
+    "data": { ...datos específicos de la respuesta... }
+}
+
+---
+
+1. MÓDULO: CUENTAS
+----------------------------------------
+
+a) Cambiar Estado de Cuenta (Deshabilitar/Habilitar)
+----------------------------------------
+- Método: PUT
+- Ruta: /cuentas/{uuid}/estado
+- Parámetros de Ruta: 
+  - `uuid` (string): UUID de la cuenta a modificar.
+- Body (JSON): `cuenta_estado_update`
+  {
+      "estado": true // o false para deshabilitar
+  }
+- Respuesta Exitosa (Data): `cuenta_response`
+  (Retorna los datos completos de la cuenta actualizada).
+
+b) Cambiar Rol de Cuenta
+----------------------------------------
+- Método: PUT
+- Ruta: /cuentas/{uuid}/rol
+- Parámetros de Ruta: 
+  - `uuid` (string): UUID de la cuenta.
+- Body (JSON): `cuenta_rol_update`
+  {
+      "rol_uuid": "uuid-del-nuevo-rol"
+  }
+- Respuesta Exitosa (Data): `cuenta_response`
+
+
+2. MÓDULO: ESCUELAS
+----------------------------------------
+
+a) Listar Escuelas con Paginación
+----------------------------------------
+- Método: GET
+- Ruta: /escuelas/
+- Query Params:
+  - `skip` (int, default: 0): Número de registros a saltar.
+  - `limit` (int, default: 100): Límite máximo de registros a retornar.
+- Respuesta Exitosa (Data): `escuelas_paginadas`
+  {
+      "total": 15,
+      "items": [
+          {
+              "uuid": "...",
+              "nombre": "Escuela de Básquet",
+              "descripcion": "Descripción",
+              "ranInferior": 5,
+              "ranSuperior": 12,
+              "estado": true
+          }, ...
+      ]
+  }
+
+b) Modificar Escuela
+----------------------------------------
+- Método: PUT
+- Ruta: /escuelas/{uuid}
+- Parámetros de Ruta: 
+  - `uuid` (string): UUID de la escuela.
+- Body (JSON): `escuela_update` (Todos los campos son opcionales)
+  {
+      "nombre": "Nuevo Nombre",
+      "descripcion": "Nueva Descripción",
+      "ranInferior": 6,
+      "ranSuperior": 14
+  }
+- Respuesta Exitosa (Data): `escuela_response`
+
+c) Cambiar Estado Escuela (Deshabilitar/Habilitar)
+----------------------------------------
+- Método: PUT
+- Ruta: /escuelas/{uuid}/estado
+- Parámetros de Ruta: 
+  - `uuid` (string): UUID de la escuela.
+- Body (JSON): `escuela_estado_update`
+  {
+      "estado": false // desactiva la escuela
+  }
+- Respuesta Exitosa (Data): `escuela_response`
+
+
+3. MÓDULO: PARTICIPANTES
+----------------------------------------
+
+a) Listar Participantes con Paginación y Búsqueda
+----------------------------------------
+- Método: GET
+- Ruta: /participantes/
+- Query Params:
+  - `skip` (int, default: 0)
+  - `limit` (int, default: 100)
+  - `q` (string, opcional): Búsqueda por coincidencia en "nombres", "apellidos" o "cedula".
+- Respuesta Exitosa (Data): `participantes_paginados`
+  {
+      "total": 50,
+      "items": [
+          { ...campos de participante_response... }, ...
+      ]
+  }
+
+b) Cambiar a un Participante de Escuela
+----------------------------------------
+- Método: PUT
+- Ruta: /participantes/{uuid}/escuela
+- Parámetros de Ruta:
+  - `uuid` (string): UUID del participante.
+- Body (JSON): `participante_escuela_update`
+  {
+      "escuela_uuid": "uuid-de-la-nueva-escuela"
+  }
+- Restricciones: El participante debe cumplir con el rango de edad de la nueva escuela.
+- Respuesta Exitosa (Data): `participante_response`
+
+
+4. MÓDULO: PERSONAS
+----------------------------------------
+
+a) Listar Personas (Todas) con Paginación
+----------------------------------------
+- Método: GET
+- Ruta: /personas/
+- Query Params:
+  - `skip` (int, default: 0)
+  - `limit` (int, default: 100)
+- Respuesta Exitosa (Data): `personas_paginadas`
+  {
+      "total": 150,
+      "items": [
+          {
+              "uuid": "...",
+              "nombres": "Juan",
+              "apellidos": "Perez",
+              "tipo": "participante" // o representante, administrador, etc.
+          }, ...
+      ]
+  }

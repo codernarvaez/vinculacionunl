@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload, contains_eager
+from sqlalchemy import or_
 from app.models.participante import Participante
 from app.models.representante import Representante
 from app.models.escuela import Escuela
@@ -71,10 +72,13 @@ class participante_service:
             # Verificar si la escuela está activa
             if not escuela.estado:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La escuela no está activa para inscripciones")
-        
+            
+            a_participante = db.query(Participante).filter(Participante.cedula == participante.cedula).first()
+
             # Verificar que el participante no esté inscrito en otra escuela
             inscripcion_existente = db.query(inscripciones).filter(
-                inscripciones.c.participante_id == participante.id
+                inscripciones.c.participante_id == a_participante.id,
+                inscripciones.c.estado == True
             ).first()
 
             if inscripcion_existente:
@@ -114,10 +118,18 @@ class participante_service:
     
     def listar_participantes_por_representante(db: Session, representante_uuid: str):
         try:
+
             representante = db.query(Representante).filter(Representante.uuid == representante_uuid).first()
             if not representante:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Representante no encontrado")
-            participantes = db.query(Participante).filter(Participante.representante_id == representante.id).all()
+                raise HTTPException(status_code=404, detail="Representante no encontrado")
+            participantes = (
+                db.query(Participante)
+                .join(Participante.escuelas.and_(inscripciones.c.estado == True)) 
+                .options(contains_eager(Participante.escuelas)) 
+                .filter(Participante.representante_id == representante.id)
+                .all()
+            )
+            
             return participantes
         except Exception as e:
             print(f"Log del error: {e}")
@@ -130,5 +142,71 @@ class participante_service:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Participante no encontrado")
             return participante
         except Exception as e:
+            print(f"Log del error: {e}")
+            raise e
+
+    def listar_participantes(db: Session, skip: int = 0, limit: int = 100, search: str = None):
+        try:
+            query = db.query(Participante)
+            if search:
+                search_term = f"%{search}%"
+                query = query.filter(
+                    or_(
+                        Participante.nombres.ilike(search_term),
+                        Participante.apellidos.ilike(search_term),
+                        Participante.cedula.ilike(search_term)
+                    )
+                )
+            
+            total = query.count()
+            items = query.offset(skip).limit(limit).all()
+            
+            return {
+                "total": total,
+                "items": items
+            }
+        except Exception as e:
+            print(f"Log del error: {e}")
+            raise e
+
+    def cambiar_escuela_participante(db: Session, participante_uuid: str, nueva_escuela_uuid: str):
+        try:
+            participante = db.query(Participante).filter(Participante.uuid == participante_uuid).first()
+            if not participante:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Participante no encontrado")
+
+            nueva_escuela = db.query(Escuela).filter(Escuela.uuid == nueva_escuela_uuid).first()
+            if not nueva_escuela:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nueva escuela no encontrada")
+
+            # Validate age requirement
+            today = date.today()
+            edad_participante = today.year - participante.fechaNac.year - (
+                (today.month, today.day) < (participante.fechaNac.month, participante.fechaNac.day)
+            )
+
+            if not (nueva_escuela.ranInferior <= edad_participante <= nueva_escuela.ranSuperior):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, 
+                    detail=f"El participante tiene {edad_participante} años y no cumple con el rango ({nueva_escuela.ranInferior}-{nueva_escuela.ranSuperior}) de la nueva escuela"
+                )
+
+            # Check if school is active
+            if not nueva_escuela.estado:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La nueva escuela no está activa")
+
+            # Remove existing enrollment
+            db.execute(
+                inscripciones.delete().where(inscripciones.c.participante_id == participante.id)
+            )
+
+            # Insert new enrollment
+            stmt = inscripciones.insert().values(participante_id=participante.id, escuela_id=nueva_escuela.id)
+            db.execute(stmt)
+            db.commit()
+
+            return participante
+        except Exception as e:
+            db.rollback()
             print(f"Log del error: {e}")
             raise e

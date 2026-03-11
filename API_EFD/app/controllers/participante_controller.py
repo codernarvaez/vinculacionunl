@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.core.get_db import get_db
 from app.services.participante_service import participante_service
 from app.schemas.response_schema import api_response
-from app.schemas.participante_schema import participante_request, participante_response
+from app.schemas.participante_schema import participante_request, participante_response, participantes_paginados, participante_escuela_update
 from datetime import date
 from uuid import UUID
 from fastapi import UploadFile, File, Form
@@ -94,6 +94,34 @@ class participante_controller:
                 code=status.HTTP_200_OK,
                 msg="Participantes por representante listados exitosamente",
                 data=participantes
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.get("/", response_model=api_response[participantes_paginados], status_code=status.HTTP_200_OK)
+    def listar_participantes(skip: int = 0, limit: int = 100, q: Optional[str] = None, db: Session = Depends(get_db)):
+        try:
+            resultado = participante_service.listar_participantes(db, skip=skip, limit=limit, search=q)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Participantes listados exitosamente",
+                data=resultado
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.put("/{participante_uuid}/escuela", response_model=api_response[participante_response], status_code=status.HTTP_200_OK)
+    def cambiar_escuela_participante(participante_uuid: str, data: participante_escuela_update, db: Session = Depends(get_db)):
+        try:
+            participante = participante_service.cambiar_escuela_participante(db, participante_uuid, str(data.escuela_uuid))
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Escuela de participante actualizada exitosamente",
+                data=participante
             )
         except HTTPException as e:
             raise e

@@ -49,18 +49,40 @@ class cuenta_service:
             user_id: str = payload.get("sub")
             if user_id is None:
                 raise credentials_exception
-            
-            # CAMBIO AQUÍ: Usa un nombre diferente a la clase importada
-            # Si importaste 'from ... import token_data', cambia el nombre de la variable
+
             current_token_payload = token_data(id=user_id) 
             
         except JWTError:
             raise credentials_exception
         
-        # Buscamos al usuario en la base de datos
         user = db.query(Cuenta).filter(Cuenta.id == current_token_payload.id).first()
         
         if user is None:
             raise credentials_exception
             
         return user
+
+    def cambiar_estado(db: Session, cuenta_uuid: str, estado: bool):
+        cuenta = db.query(Cuenta).filter(Cuenta.uuid == cuenta_uuid).first()
+        if not cuenta:
+            raise ValueError("Cuenta no encontrada")
+        
+        cuenta.estado = estado
+        db.commit()
+        db.refresh(cuenta)
+        return cuenta
+
+    def cambiar_rol(db: Session, cuenta_uuid: str, rol_uuid: str):
+        cuenta = db.query(Cuenta).filter(Cuenta.uuid == cuenta_uuid).first()
+        if not cuenta:
+            raise ValueError("Cuenta no encontrada")
+            
+        from ..models.rol import Rol
+        rol = db.query(Rol).filter(Rol.uuid == rol_uuid).first()
+        if not rol:
+            raise ValueError("Rol no encontrado")
+            
+        cuenta.rol_id = rol.id
+        db.commit()
+        db.refresh(cuenta)
+        return cuenta

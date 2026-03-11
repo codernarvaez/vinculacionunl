@@ -1,11 +1,18 @@
 from pydantic import BaseModel, EmailStr, ConfigDict
 from typing import Optional
-
+from app.schemas.rol_schema import RolResponse
 
 class login_request(BaseModel):
     correo: EmailStr
     clave: str
 
+class CuentaResponse(BaseModel):
+    uuid: str
+    correo: str
+    estado: bool
+    rol: RolResponse  
+    
+    model_config = ConfigDict(from_attributes=True)
 
 class login_response(BaseModel):
     uuid: Optional[str] = None
@@ -22,3 +29,9 @@ class token_data(BaseModel):
 
 class auth_Schema:
     pass
+
+class cuenta_estado_update(BaseModel):
+    estado: bool
+
+class cuenta_rol_update(BaseModel):
+    rol_uuid: str

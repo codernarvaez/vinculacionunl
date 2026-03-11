@@ -59,3 +59,56 @@ class escuela_service:
         except Exception as e:
             print(f"Log del error: {e}")
             raise e
+
+    def modificar_escuela(db: Session, escuela_uuid: str, update_data):
+        try:
+            escuela = db.query(Escuela).filter(Escuela.uuid == escuela_uuid).first()
+            if not escuela:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Escuela no encontrada")
+
+            update_dict = update_data.model_dump(exclude_unset=True)
+            
+            # Additional validation
+            ranInferior = update_dict.get('ranInferior', escuela.ranInferior)
+            ranSuperior = update_dict.get('ranSuperior', escuela.ranSuperior)
+            
+            if ranInferior >= ranSuperior:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El rango inferior debe ser menor al rango superior")
+
+            for key, value in update_dict.items():
+                setattr(escuela, key, value)
+
+            db.commit()
+            db.refresh(escuela)
+            return escuela
+        except Exception as e:
+            db.rollback()
+            print(f"Log del error: {e}")
+            raise e
+
+    def cambiar_estado_escuela(db: Session, escuela_uuid: str, estado: bool):
+        try:
+            escuela = db.query(Escuela).filter(Escuela.uuid == escuela_uuid).first()
+            if not escuela:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Escuela no encontrada")
+
+            escuela.estado = estado
+            db.commit()
+            db.refresh(escuela)
+            return escuela
+        except Exception as e:
+            db.rollback()
+            print(f"Log del error: {e}")
+            raise e
+
+    def listar_escuelas(db: Session, skip: int = 0, limit: int = 100):
+        try:
+            total = db.query(Escuela).count()
+            items = db.query(Escuela).offset(skip).limit(limit).all()
+            return {
+                "total": total,
+                "items": items
+            }
+        except Exception as e:
+            print(f"Log del error: {e}")
+            raise e

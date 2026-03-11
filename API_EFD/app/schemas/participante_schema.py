@@ -1,9 +1,10 @@
 from pydantic import BaseModel, EmailStr, ConfigDict, Field
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
-from datetime import date
+from datetime import date, datetime
 from ..models.participante import TipoGenero
 from fastapi import UploadFile, File
+from app.schemas.escuela_schema import escuela_response
 
 
 class participante_request(BaseModel):
@@ -29,5 +30,14 @@ class participante_response(BaseModel):
     condicionMedica: Optional[str]
     foto: Optional[str]
     acepto_terminos: bool
+    updated_at: datetime
+    escuelas: List[escuela_response]
 
     model_config = ConfigDict(from_attributes=True)
+
+class participante_escuela_update(BaseModel):
+    escuela_uuid: UUID
+
+class participantes_paginados(BaseModel):
+    total: int
+    items: List[participante_response]

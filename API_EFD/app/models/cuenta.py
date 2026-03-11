@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from app.models.base_model_orm import BaseModelORM
 
@@ -7,6 +7,7 @@ class Cuenta(BaseModelORM):
 
     correo = Column(String(100), nullable=False, unique=True)
     clave = Column(String(255), nullable=False)
+    estado = Column(Boolean, default=True, nullable=False)
 
     rol_id = Column(ForeignKey("roles.id"), nullable=False)
     rol = relationship("Rol", back_populates="cuentas")
