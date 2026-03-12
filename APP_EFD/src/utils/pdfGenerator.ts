@@ -86,7 +86,7 @@ export const generateAthletePdf = async (athlete: IAthletes) => {
     };
 
     drawInfo('Cédula de Identidad', athlete.cedula || '0000000000', 30);
-    drawInfo('Escuela Deportiva', athlete.escuelas?.[0]?.nombre || 'Formativa Principal', 38);
+    drawInfo('Escuela Deportiva', athlete.escuelas?.[0]?.nombre || 'Sin escuela asignada', 38);
 
 
     doc.setTextColor(subTextColor);

@@ -56,12 +56,13 @@ export async function methodPOST<T, D = unknown>(endpoint: string, data: D): Pro
     return result as ApiResponse<T>;
 }
 export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Promise<T> {
+    const isFormData = data instanceof FormData;
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json',
+            ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         },
-        body: JSON.stringify(data),
+        body: isFormData ? (data as unknown as BodyInit) : JSON.stringify(data),
     });
     if (!response.ok) {
         const errorData: ApiError = await response.json();

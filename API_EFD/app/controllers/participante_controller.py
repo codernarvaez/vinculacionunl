@@ -127,3 +127,55 @@ class participante_controller:
             raise e
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.put("/{participante_uuid}", response_model=api_response[participante_response], status_code=status.HTTP_200_OK)
+    def actualizar_participante_e_inscripcion(
+        participante_uuid: str,
+        nombres: str = Form(...),
+        apellidos: str = Form(...),
+        cedula: str = Form(...),
+        fechaNac: date = Form(...),
+        genero: TipoGenero = Form(...),
+        escuela_uuid: str = Form(...),
+        condicionMedica: Optional[str] = Form(None),
+        foto: Optional[UploadFile] = File(None),
+        db: Session = Depends(get_db)
+    ):
+        try:
+            data_dict = {
+                "nombres": nombres,
+                "apellidos": apellidos,
+                "cedula": cedula,
+                "fechaNac": fechaNac,
+                "genero": genero,
+                "escuela_uuid": escuela_uuid,
+                "condicionMedica": condicionMedica,
+                "foto": foto
+            }
+            from types import SimpleNamespace
+            participante_data = SimpleNamespace(**data_dict)
+            participante = participante_service.actualizar_participante_e_inscripcion(db, participante_uuid, participante_data)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Participante actualizado exitosamente",
+                data=participante
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+
+    @router.put("/{participante_uuid}/dar_baja_escuela", response_model=api_response[participante_response], status_code=status.HTTP_200_OK)
+    def dar_baja_de_escuela_a_un_participante(participante_uuid: str, db: Session = Depends(get_db)):
+        try:
+            participante = participante_service.dar_baja_de_escuela_a_un_participante(db, participante_uuid)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Participante dado de baja exitosamente",
+                data=participante
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")

@@ -4,6 +4,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from 'sonner';
+import Swal from 'sweetalert2';
 import { methodPOST } from "../../api/access";
 
 const SectionDivider = ({ title }: { title: string }) => (
@@ -74,6 +75,21 @@ const Register: React.FC = () => {
     });
 
     const onSubmit = async (data: IRegisterForm) => {
+        const result = await Swal.fire({
+            title: '¿Confirmar registro?',
+            text: '¿Estás seguro de que deseas crear esta cuenta de representante?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Sí, registrar',
+            cancelButtonText: 'Cancelar',
+            background: '#1a1d21',
+            color: '#ffffff'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             const response = await methodPOST<RegisterResponse, IRegisterForm>('/representantes', data);
             console.log(response.msg);

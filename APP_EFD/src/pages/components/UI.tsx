@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 // --- Interfaces ---
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -201,7 +201,23 @@ export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender,
         Ver Detalles
       </Link>
       <button 
-        onClick={onDownloadPdf}
+        onClick={async () => {
+          const result = await Swal.fire({
+            title: '¿Generar carnet?',
+            text: `¿Deseas descargar el carnet PDF de ${name}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Sí, generar',
+            cancelButtonText: 'Cancelar',
+            background: '#1a1d21',
+            color: '#ffffff'
+          });
+          if (result.isConfirmed) {
+            onDownloadPdf?.();
+          }
+        }}
         className="w-full py-2 bg-transparent border border-gray-700 text-gray-400 hover:text-white hover:border-white rounded text-xs uppercase transition-colors flex justify-center items-center gap-2"
       >
         <span className="material-icons-outlined text-sm">picture_as_pdf</span>
@@ -326,13 +342,14 @@ export const Modal: React.FC<{
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-}> = ({ isOpen, onClose, title, children }) => {
+  className?: string;
+}> = ({ isOpen, onClose, title, children, className = "max-w-md" }) => {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-[#0d0f12] border border-gray-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
+        className={`bg-[#0d0f12] border border-gray-800 rounded-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-black/20">

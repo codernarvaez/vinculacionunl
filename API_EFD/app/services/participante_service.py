@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session, joinedload, contains_eager
-from sqlalchemy import or_
+from sqlalchemy import or_, update, delete
 from app.models.participante import Participante
 from app.models.representante import Representante
 from app.models.escuela import Escuela
@@ -104,6 +104,92 @@ class participante_service:
             print(f"Log del error: {e}")
             raise e
     
+    def actualizar_participante_e_inscripcion(db: Session, participante_uuid: str, participante_data):
+        try:
+            # 1. Buscar el participante existente por UUID
+            participante = db.query(Participante).filter(Participante.uuid == participante_uuid).first()
+            if not participante:
+                raise HTTPException(status_code=404, detail="Participante no encontrado")
+
+            # 2. Manejo de Foto (Solo si se envía un nuevo archivo de imagen)
+            if hasattr(participante_data, 'foto') and participante_data.foto is not None:
+                UPLOAD_DIR = "public/uploads"
+                if not os.path.exists(UPLOAD_DIR): 
+                    os.makedirs(UPLOAD_DIR)
+                
+                # Borrar foto física anterior para evitar basura en el servidor
+                if participante.foto and os.path.exists(participante.foto):
+                    try:
+                        os.remove(participante.foto)
+                    except Exception as e:
+                        print(f"No se pudo eliminar la foto antigua: {e}")
+
+                file_extension = os.path.splitext(participante_data.foto.filename)[1]
+                unique_filename = f"{uuid.uuid4()}{file_extension}"
+                file_path = os.path.join(UPLOAD_DIR, unique_filename)
+                
+                with open(file_path, "wb") as buffer:
+                    shutil.copyfileobj(participante_data.foto.file, buffer)
+                
+                participante.foto = file_path
+
+            # 3. Actualizar datos básicos
+            participante.nombres = participante_data.nombres
+            participante.apellidos = participante_data.apellidos
+            participante.cedula = participante_data.cedula
+            participante.fechaNac = participante_data.fechaNac
+            participante.genero = participante_data.genero
+            participante.condicionMedica = participante_data.condicionMedica
+            
+            # 4. Lógica de Cambio de Escuela
+            escuela_uuid_str = str(participante_data.escuela_uuid)
+            nueva_escuela = db.query(Escuela).filter(Escuela.uuid == escuela_uuid_str).first()
+
+            if not nueva_escuela:
+                raise HTTPException(status_code=404, detail="Nueva escuela no encontrada")
+
+            # Validar Edad para la nueva escuela
+            today = date.today()
+            edad = today.year - participante.fechaNac.year - (
+                (today.month, today.day) < (participante.fechaNac.month, participante.fechaNac.day)
+            )
+            if not (nueva_escuela.ranInferior <= edad <= nueva_escuela.ranSuperior):
+                raise HTTPException(
+                    status_code=400, 
+                    detail=f"El participante tiene {edad} años. Rango permitido: {nueva_escuela.ranInferior}-{nueva_escuela.ranSuperior}"
+                )
+
+            # 5. Gestión de Inscripciones (Limpieza para evitar errores de duplicidad)
+            # Verificamos si ya existe una inscripción para este participante
+            inscripcion_actual = db.execute(
+                inscripciones.select().where(
+                    inscripciones.c.participante_id == participante.id
+                )
+            ).first()
+
+            # Si no hay inscripción o la escuela es diferente, borramos e insertamos
+            if not inscripcion_actual or inscripcion_actual.escuela_id != nueva_escuela.id:
+                db.execute(
+                    delete(inscripciones)
+                    .where(inscripciones.c.participante_id == participante.id)
+                )
+                
+                stmt = inscripciones.insert().values(
+                    participante_id=participante.id, 
+                    escuela_id=nueva_escuela.id,
+                    estado=True
+                )
+                db.execute(stmt)
+
+            db.commit()
+            db.refresh(participante)
+            return participante
+
+        except Exception as e:
+            db.rollback()
+            print(f"Log del error en el servicio: {e}")
+            raise e
+    
     def listar_participantes_inscritos(db: Session, escuela_uuid: str):
         try:
             escuela = db.query(Escuela).filter(Escuela.uuid == escuela_uuid).first()
@@ -118,18 +204,18 @@ class participante_service:
     
     def listar_participantes_por_representante(db: Session, representante_uuid: str):
         try:
-
             representante = db.query(Representante).filter(Representante.uuid == representante_uuid).first()
             if not representante:
                 raise HTTPException(status_code=404, detail="Representante no encontrado")
+
             participantes = (
                 db.query(Participante)
-                .join(Participante.escuelas.and_(inscripciones.c.estado == True)) 
-                .options(contains_eager(Participante.escuelas)) 
+                .outerjoin(inscripciones, (inscripciones.c.participante_id == Participante.id) & (inscripciones.c.estado == True))
+                .outerjoin(Escuela, Escuela.id == inscripciones.c.escuela_id)
+                .options(contains_eager(Participante.escuelas))
                 .filter(Participante.representante_id == representante.id)
                 .all()
             )
-            
             return participantes
         except Exception as e:
             print(f"Log del error: {e}")
@@ -179,7 +265,7 @@ class participante_service:
             if not nueva_escuela:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nueva escuela no encontrada")
 
-            # Validate age requirement
+
             today = date.today()
             edad_participante = today.year - participante.fechaNac.year - (
                 (today.month, today.day) < (participante.fechaNac.month, participante.fechaNac.day)
@@ -191,20 +277,35 @@ class participante_service:
                     detail=f"El participante tiene {edad_participante} años y no cumple con el rango ({nueva_escuela.ranInferior}-{nueva_escuela.ranSuperior}) de la nueva escuela"
                 )
 
-            # Check if school is active
+   
             if not nueva_escuela.estado:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La nueva escuela no está activa")
 
-            # Remove existing enrollment
+         
             db.execute(
                 inscripciones.delete().where(inscripciones.c.participante_id == participante.id)
             )
 
-            # Insert new enrollment
             stmt = inscripciones.insert().values(participante_id=participante.id, escuela_id=nueva_escuela.id)
             db.execute(stmt)
             db.commit()
 
+            return participante
+        except Exception as e:
+            db.rollback()
+            print(f"Log del error: {e}")
+            raise e
+    
+    def dar_baja_de_escuela_a_un_participante(db: Session, participante_uuid: str):
+        try:
+            participante = db.query(Participante).filter(Participante.uuid == participante_uuid).first()
+            if not participante:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Participante no encontrado")
+
+            db.execute(
+                inscripciones.delete().where(inscripciones.c.participante_id == participante.id)
+            )
+            db.commit()
             return participante
         except Exception as e:
             db.rollback()

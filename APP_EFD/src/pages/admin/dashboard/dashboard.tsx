@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { logout, getNamesCurrentUser } from '../../../services/auth';
 import AdminService, { type AdminUser, type Role } from '../../../services/admin';
 import { toast } from 'sonner';
+import Swal from 'sweetalert2';
 import { ITEMSPERPAGE } from '../../../consts/consts';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
@@ -129,8 +130,24 @@ const AdminDashboard: React.FC = () => {
         }
     };
 
-    const handleStatusToggle = async (uuid: string, currentStatus: boolean) => {
+    const handleStatusToggle = async (uuid: string, currentStatus: boolean, userName: string) => {
         const newStatus = !currentStatus;
+
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            text: `¿Deseas ${newStatus ? 'habilitar' : 'deshabilitar'} al usuario ${userName}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: `Sí, ${newStatus ? 'habilitar' : 'deshabilitar'}`,
+            cancelButtonText: 'Cancelar',
+            background: '#1a1d21',
+            color: '#ffffff'
+        });
+
+        if (!result.isConfirmed) return;
+
         try {
             const success = await AdminService.toggleUserStatus(uuid, newStatus);
             if (success) {
@@ -303,7 +320,7 @@ const AdminDashboard: React.FC = () => {
                                                         icon={user.cuenta.estado ? "block" : "check_circle"}
                                                         variant={user.cuenta.estado ? "danger" : "primary"}
                                                         title={user.cuenta.estado ? "Deshabilitar" : "Habilitar"}
-                                                        onClick={() => user.cuenta.estado !== undefined && handleStatusToggle(user.cuenta.uuid, user.cuenta.estado)}
+                                                        onClick={() => user.cuenta.estado !== undefined && handleStatusToggle(user.cuenta.uuid, user.cuenta.estado, `${user.nombres} ${user.apellidos}`)}
                                                     />
                                                 </div>
                                             </TableCell>

@@ -7,6 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { methodPOST } from '../../../api/access';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import Swal from 'sweetalert2';
 import SchoolsService from '../../../services/schools';
 import type { IEscuela } from '../../../services/schools';
 import { getUUIDCurrentUser } from '../../../services/auth';
@@ -113,6 +114,21 @@ const ParticipantRegister: React.FC = () => {
 
 
   const onSubmit: SubmitData = async (data) => {
+    const result = await Swal.fire({
+      title: '¿Confirmar registro?',
+      text: '¿Estás seguro de que deseas registrar a este participante?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#10b981',
+      cancelButtonColor: '#ef4444',
+      confirmButtonText: 'Sí, registrar',
+      cancelButtonText: 'Cancelar',
+      background: '#1a1d21',
+      color: '#ffffff'
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
       const fechaFormateada = data.fechaNac instanceof Date
         ? data.fechaNac.toISOString().split('T')[0]

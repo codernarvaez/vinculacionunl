@@ -1,4 +1,4 @@
-import { methodGET } from '../api/access';
+import { methodGET, methodPUT } from '../api/access';
 import type { ApiResponse } from '../api/access';
 
 export interface IAthletes {
@@ -49,6 +49,26 @@ class AthletesService {
         }
     }
 
+    static async putAthleteByUUID(uuid_participante: string, data: FormData | IAthletes): Promise<IAthletes | null> {
+        try {
+            const response = await methodPUT<ApiResponse<IAthletes>>(`/participantes/${uuid_participante}`, data);
+            console.log(response)
+            return response.data || null;
+        } catch (error) {
+            console.error("Error fetching schools:", error);
+            throw error;
+        }
+    }
+
+    static async downAtheleteOfSchool(uuid_participante: string): Promise<any> {
+        try {
+            const response = await methodPUT<ApiResponse<IAthletes>>(`/participantes/${uuid_participante}/dar_baja_escuela`, {});
+            return response.data || null;
+        } catch (error) {
+            console.error("Error removing athlete from school:", error);
+            throw error;
+        }
+    }
 }
 
-export default AthletesService;
+export default AthletesService
