@@ -7,8 +7,8 @@ export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface ApiResponse<T = unknown> {
     code: number;
-    msg: string;    
-    data: T | null; 
+    msg: string;
+    data: T | null;
 }
 
 export interface ApiError {
@@ -18,6 +18,7 @@ export interface ApiError {
 export async function methodGET<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
         },
@@ -34,6 +35,7 @@ export async function methodPOST<T, D = unknown>(endpoint: string, data: D): Pro
 
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
             // 'Authorization': `Bearer ${localStorage.getItem('token')}` 
@@ -59,6 +61,7 @@ export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Prom
     const isFormData = data instanceof FormData;
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'PUT',
+        credentials: 'include',
         headers: {
             ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         },
@@ -74,6 +77,7 @@ export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Prom
 export async function methodDELETE<T>(endpoint: string): Promise<T> {
     const response = await fetch(`${API_URL}${endpoint}`, {
         method: 'DELETE',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
         },

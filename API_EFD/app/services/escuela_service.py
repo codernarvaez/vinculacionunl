@@ -101,14 +101,10 @@ class escuela_service:
             print(f"Log del error: {e}")
             raise e
 
-    def listar_escuelas(db: Session, skip: int = 0, limit: int = 100):
+    def listar_escuelas(db: Session):
         try:
-            total = db.query(Escuela).count()
-            items = db.query(Escuela).offset(skip).limit(limit).all()
-            return {
-                "total": total,
-                "items": items
-            }
+            items = db.query(Escuela).all()
+            return items
         except Exception as e:
             print(f"Log del error: {e}")
-            raise e
+            

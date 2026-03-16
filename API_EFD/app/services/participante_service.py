@@ -231,9 +231,15 @@ class participante_service:
             print(f"Log del error: {e}")
             raise e
 
-    def listar_participantes(db: Session, skip: int = 0, limit: int = 100, search: str = None):
+    def listar_participantes(db: Session, skip: int = 0, limit: int = 100, search: str = None, escuela_uuid: str = None):
         try:
             query = db.query(Participante)
+
+            if escuela_uuid:
+                query = query.join(inscripciones, Participante.id == inscripciones.c.participante_id) \
+                            .join(Escuela, Escuela.id == inscripciones.c.escuela_id) \
+                            .filter(Escuela.uuid == escuela_uuid)
+            
             if search:
                 search_term = f"%{search}%"
                 query = query.filter(
@@ -244,15 +250,17 @@ class participante_service:
                     )
                 )
             
+            query = query.distinct()
             total = query.count()
-            items = query.offset(skip).limit(limit).all()
+            items = query.options(joinedload(Participante.escuelas)).offset(skip).limit(limit).all()
             
             return {
                 "total": total,
                 "items": items
             }
+            
         except Exception as e:
-            print(f"Log del error: {e}")
+            print(f"Error en listar_participantes: {e}")
             raise e
 
     def cambiar_escuela_participante(db: Session, participante_uuid: str, nueva_escuela_uuid: str):

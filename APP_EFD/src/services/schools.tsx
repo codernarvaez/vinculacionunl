@@ -1,5 +1,6 @@
 import { methodGET, methodPOST, methodPUT } from '../api/access';
 import type { ApiResponse } from '../api/access';
+
 export interface IEscuela {
     id: number;
     administrador_id: number;
@@ -24,6 +25,36 @@ class SchoolsService {
         } catch (error) {
             console.error("Error fetching schools:", error);
             throw error;
+        }
+    }
+
+    static async getAllSchools(): Promise<IEscuela[]> {
+        try {
+            const response = await methodGET<ApiResponse<IEscuela[]>>('/escuelas');
+            return response.data || [];
+        } catch (error) {
+            console.error("Error fetching schools:", error);
+            throw error;
+        }
+    }
+
+    static async updateSchool(uuid: string, data: Partial<IEscuela>): Promise<boolean> {
+        try {
+            await methodPUT(`/escuelas/${uuid}`, data);
+            return true;
+        } catch (error) {
+            console.error(`Error updating school ${uuid}:`, error);
+            return false;
+        }
+    }
+
+    static async toggleSchoolStatus(schoolUuid: string, isActive: boolean): Promise<boolean> {
+        try {
+            await methodPUT(`/escuelas/${schoolUuid}/estado`, { estado: isActive });
+            return true;
+        } catch (error) {
+            console.error(`Error toggling status for school ${schoolUuid}:`, error);
+            return false;
         }
     }
 

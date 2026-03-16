@@ -4,13 +4,15 @@ from app.schemas.response_schema import api_response
 from app.schemas.rol_schema import RolResponse
 from app.core.get_db import get_db
 from sqlalchemy.orm import Session
+from app.services.cuenta_service import cuenta_service
+from app.models.cuenta import Cuenta
 
 class rol_controller:
 
     router = APIRouter(prefix="/roles", tags=["Roles"])
 
     @router.get("/", response_model=api_response[list[RolResponse]], status_code=status.HTTP_200_OK)
-    def listar_roles(db: Session = Depends(get_db)):
+    def listar_roles(db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["administrador"]))):
         try:
             resultado = rol_service.listar_roles(db)
             return api_response(

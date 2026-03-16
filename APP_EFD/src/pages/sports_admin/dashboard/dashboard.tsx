@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { SidebarItem, Table, TableHead, TableBody, TableRow, TableCell, Badge, IconButton, InputField, Modal, SelectField, TextAreaField, PrimaryButton } from '../../../pages/components/UI';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { logout, getNamesCurrentUser, getUUIDCurrentUser } from '../../../services/auth';
 import SportsAdminService from '../../../services/sportsAdmin';
 import AthletesService, { type IAthletes } from '../../../services/athletes';
@@ -37,6 +37,7 @@ interface ISchoolFormValues {
 }
 
 const SportsAdminDashboard: React.FC = () => {
+    const navigate = useNavigate();
     const [viewMode, setViewMode] = useState<ViewMode>('ATHLETES');
 
     // States for Athletes
@@ -47,12 +48,14 @@ const SportsAdminDashboard: React.FC = () => {
     const [debouncedAthleteSearch, setDebouncedAthleteSearch] = useState('');
     const [athletePage, setAthletePage] = useState(1);
 
+    // Filter States
+    const [selectedSchoolFilter, setSelectedSchoolFilter] = useState('');
+    const [filterSchools, setFilterSchools] = useState<IEscuela[]>([]);
+
     // States for Schools
     const [schools, setSchools] = useState<IEscuela[]>([]);
-    const [totalSchools, setTotalSchools] = useState(0);
     const [schoolsLoading, setSchoolsLoading] = useState(false);
     const [schoolSearch, setSchoolSearch] = useState('');
-    const [schoolPage, setSchoolPage] = useState(1);
 
     // Edit Athlete Modal States
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -151,6 +154,18 @@ const SportsAdminDashboard: React.FC = () => {
         fetchFilteredSchools();
     }, [selectedDate]);
 
+    useEffect(() => {
+        const fetchAllSchoolsForFilter = async () => {
+            try {
+                const data = await SchoolsService.getAllSchools();
+                setFilterSchools(data);
+            } catch (error) {
+                console.error("Error fetching schools for filter:", error);
+            }
+        };
+        fetchAllSchoolsForFilter();
+    }, []);
+
     const itemsPerPage = ITEMSPERPAGE;
 
     // --- Fetchers ---
@@ -159,7 +174,7 @@ const SportsAdminDashboard: React.FC = () => {
 
         try {
             const skip = (athletePage - 1) * itemsPerPage;
-            const data = await SportsAdminService.getAllAthletes(skip, itemsPerPage, debouncedAthleteSearch);
+            const data = await SportsAdminService.getAllAthletes(skip, itemsPerPage, debouncedAthleteSearch, selectedSchoolFilter);
             setAthletes(data.items);
             setTotalAthletes(data.total);
         } catch (error: unknown) {
@@ -173,15 +188,13 @@ const SportsAdminDashboard: React.FC = () => {
         } finally {
             setAthletesLoading(false);
         }
-    }, [athletePage, debouncedAthleteSearch, itemsPerPage]);
+    }, [athletePage, debouncedAthleteSearch, itemsPerPage, selectedSchoolFilter]);
 
     const fetchSchools = useCallback(async () => {
         setSchoolsLoading(true);
         try {
-            const skip = (schoolPage - 1) * itemsPerPage;
-            const data = await SportsAdminService.getAllSchools(skip, itemsPerPage);
-            setSchools(data.items);
-            setTotalSchools(data.total);
+            const data = await SchoolsService.getAllSchools();
+            setSchools(data);
         } catch (error: unknown) {
             if (error instanceof Error) {
                 toast.error("Error al cargar escuelas", {
@@ -193,7 +206,7 @@ const SportsAdminDashboard: React.FC = () => {
         } finally {
             setSchoolsLoading(false);
         }
-    }, [schoolPage, itemsPerPage]);
+    }, []);
 
     // --- Search Debounce ---
     useEffect(() => {
@@ -215,7 +228,6 @@ const SportsAdminDashboard: React.FC = () => {
     }, [viewMode, fetchAthletes, fetchSchools]);
 
     const totalAthletePages = Math.ceil(totalAthletes / itemsPerPage) || 1;
-    const totalSchoolPages = Math.ceil(totalSchools / itemsPerPage) || 1;
 
     // --- Handlers ---
     const handleRemoveAthleteFromSchool = async (uuid: string) => {
@@ -349,6 +361,11 @@ const SportsAdminDashboard: React.FC = () => {
         setAthletePage(1); // Reset page on search
     };
 
+    const handleSchoolFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedSchoolFilter(e.target.value);
+        setAthletePage(1); // Reset page on filter change
+    };
+
     const handleOpenEditModal = async (athleteUuid: string) => {
         try {
             const athlete = await AthletesService.getAthleteByUUID(athleteUuid);
@@ -465,6 +482,11 @@ const SportsAdminDashboard: React.FC = () => {
         return s.nombre.toLowerCase().includes(search) || s.descripcion.toLowerCase().includes(search);
     });
 
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
+
     return (
         <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
             <aside className="w-64 flex flex-col bg-[#0d0f12] border-r border-gray-800/50 relative z-20">
@@ -503,10 +525,10 @@ const SportsAdminDashboard: React.FC = () => {
                             <p className="text-[10px] text-gray-500 uppercase font-medium">Administrador</p>
                         </div>
                     </div>
-                    <Link to="/login" onClick={logout} className="flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold text-secondary border border-secondary/20 hover:bg-secondary/10 rounded-lg transition-all uppercase tracking-widest">
+                    <button onClick={handleLogout} className="flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold text-secondary border border-secondary/20 hover:bg-secondary/10 rounded-lg transition-all uppercase tracking-widest cursor-pointer">
                         <span className="material-icons-outlined mr-2 text-sm">logout</span>
                         Cerrar Sesión
-                    </Link>
+                    </button>
                 </div>
             </aside>
 
@@ -537,15 +559,29 @@ const SportsAdminDashboard: React.FC = () => {
                     {viewMode === 'ATHLETES' ? (
                         <>
                             <div className="flex flex-col sm:flex-row justify-between items-end gap-4 mb-6">
-                                <div className="w-full sm:w-96">
-                                    <InputField
-                                        id="searchAthlete"
-                                        label="Buscar Atleta"
-                                        placeholder="Buscar por nombre o cédula..."
-                                        icon="search"
-                                        value={athleteSearch}
-                                        onChange={handleAthleteSearchChange}
-                                    />
+                                <div className="w-full lg:w-2/3 flex flex-col sm:flex-row gap-4">
+                                    <div className="flex-1">
+                                        <InputField
+                                            id="searchAthlete"
+                                            label="Buscar Atleta"
+                                            placeholder="Buscar por nombre o cédula..."
+                                            icon="search"
+                                            value={athleteSearch}
+                                            onChange={handleAthleteSearchChange}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <SelectField
+                                            id="filterSchool"
+                                            label="Filtrar por Escuela"
+                                            value={selectedSchoolFilter}
+                                            onChange={handleSchoolFilterChange}
+                                            options={[
+                                                { value: '', label: 'Todas las Escuelas' },
+                                                ...filterSchools.map(s => ({ value: s.uuid, label: `${s.nombre} (${s.ranInferior}-${s.ranSuperior})` }))
+                                            ]}
+                                        />
+                                    </div>
                                 </div>
                             </div>
                             <div className="bg-surface-dark rounded-xl border border-gray-800 shadow-xl overflow-hidden pt-4">
@@ -626,7 +662,7 @@ const SportsAdminDashboard: React.FC = () => {
                                         placeholder="Filtrar por nombre..."
                                         icon="search"
                                         value={schoolSearch}
-                                        onChange={(e) => { setSchoolSearch(e.target.value); setSchoolPage(1); }}
+                                        onChange={(e) => { setSchoolSearch(e.target.value); }}
                                     />
                                 </div>
                             </div>
@@ -637,7 +673,7 @@ const SportsAdminDashboard: React.FC = () => {
                                         Oferta de Escuelas
                                     </h3>
                                     <span className="text-xs font-bold text-gray-500 bg-gray-900 px-3 py-1 rounded-full uppercase tracking-widest">
-                                        Mostrando {totalSchools > 0 ? ((schoolPage - 1) * itemsPerPage) + 1 : 0} - {Math.min(schoolPage * itemsPerPage, totalSchools)} de {totalSchools}
+                                        Total: {filteredSchools.length}
                                     </span>
                                 </div>
                                 {schoolsLoading ? (
@@ -678,13 +714,6 @@ const SportsAdminDashboard: React.FC = () => {
                                         </TableBody>
                                     </Table>
                                 )}
-                                <div className="px-6 py-4 border-t border-gray-800 flex items-center justify-between bg-black/20">
-                                    <p className="text-xs text-gray-500 font-medium tracking-wide">Página <span className="text-white font-bold">{schoolPage}</span> de <span className="text-white font-bold">{totalSchoolPages}</span></p>
-                                    <div className="flex items-center gap-2">
-                                        <button onClick={() => setSchoolPage(p => Math.max(p - 1, 1))} disabled={schoolPage === 1} className="p-1.5 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-50"><span className="material-icons-outlined text-sm">chevron_left</span></button>
-                                        <button onClick={() => setSchoolPage(p => Math.min(p + 1, totalSchoolPages))} disabled={schoolPage === totalSchoolPages} className="p-1.5 rounded-lg border border-gray-700 text-gray-400 hover:text-white hover:bg-gray-800 disabled:opacity-50"><span className="material-icons-outlined text-sm">chevron_right</span></button>
-                                    </div>
-                                </div>
                             </div>
                         </>
                     )}

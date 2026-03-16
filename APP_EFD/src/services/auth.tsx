@@ -1,18 +1,24 @@
+import { methodPOST } from "../api/access";
+import { useAuthStore } from "../store/authStore";
+
 export function getUUIDCurrentUser(): string | null {
-    return localStorage.getItem('uuid');
+    return useAuthStore.getState().user?.uuid || null;
 }
 
 export function getRoleCurrentUser(): string | null {
-    return localStorage.getItem('rol');
+    return useAuthStore.getState().user?.rol || null;
 }
 
-export function logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('rol');
-    localStorage.removeItem('uuid');
-    localStorage.removeItem('nombres');
+export async function logout() {
+    try {
+        await methodPOST('/cuentas/logout', {});
+    } catch (error) {
+        console.error("Error en el logout del servidor", error);
+    } finally {
+        useAuthStore.getState().logout();
+    }
 }
 
 export function getNamesCurrentUser(): string | null {
-    return localStorage.getItem('nombres');
+    return useAuthStore.getState().user?.nombres || null;
 }

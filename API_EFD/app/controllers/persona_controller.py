@@ -4,11 +4,13 @@ from app.core.get_db import get_db
 from app.services.persona_service import persona_service
 from app.schemas.response_schema import api_response
 from app.schemas.persona_schema import personas_paginadas
+from app.services.cuenta_service import cuenta_service
+from app.models.cuenta import Cuenta
 class persona_controller:
     router = APIRouter(prefix="/personas", tags=["Personas"])
 
     @router.get("/", response_model=api_response[personas_paginadas], status_code=status.HTTP_200_OK)
-    def listar_personas(skip: int = 0, limit: int = 100, search: str = None, db: Session = Depends(get_db)):
+    def listar_personas(skip: int = 0, limit: int = 100, search: str = None, db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["administrador", "gestor"]))):
         try:
             resultado = persona_service.listar_personas(db, skip=skip, limit=limit, search=search)
             return api_response(

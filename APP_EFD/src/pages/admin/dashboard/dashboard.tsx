@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
 import { SidebarItem, Table, TableHead, TableBody, TableRow, TableCell, Badge, IconButton, InputField, Modal, SelectField, PrimaryButton } from '../../../pages/components/UI';
-import { Link } from 'react-router-dom';
 import { logout, getNamesCurrentUser } from '../../../services/auth';
 import AdminService, { type AdminUser, type Role } from '../../../services/admin';
 import { toast } from 'sonner';
@@ -9,8 +8,10 @@ import { ITEMSPERPAGE } from '../../../consts/consts';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard: React.FC = () => {
+    const navigate = useNavigate();
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [totalUsers, setTotalUsers] = useState(0);
     const [loading, setLoading] = useState(true);
@@ -168,6 +169,11 @@ const AdminDashboard: React.FC = () => {
         return 'neutral';
     };
 
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
+
 
     return (
         <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
@@ -208,10 +214,10 @@ const AdminDashboard: React.FC = () => {
                             <p className="text-[10px] text-gray-500 uppercase font-medium">Administrador</p>
                         </div>
                     </div>
-                    <Link to="/login" onClick={logout} className="flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold text-secondary border border-secondary/20 hover:bg-secondary/10 rounded-lg transition-all uppercase tracking-widest">
+                    <button onClick={handleLogout} className="flex items-center justify-center w-full px-4 py-2.5 text-xs font-bold text-secondary border border-secondary/20 hover:bg-secondary/10 rounded-lg transition-all uppercase tracking-widest cursor-pointer">
                         <span className="material-icons-outlined mr-2 text-sm">logout</span>
                         Cerrar Sesión
-                    </Link>
+                    </button>
                 </div>
             </aside>
 

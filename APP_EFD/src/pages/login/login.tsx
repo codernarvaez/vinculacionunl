@@ -7,6 +7,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { methodPOST } from '../../api/access';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useAuthStore } from '../../store/authStore';
 
 interface IInitialValue {
     correo: string;
@@ -51,12 +52,23 @@ const Login: React.FC = () => {
                 toast.success(`¡Bienvenido, ${response.data.nombres}!`, {
                     description: 'Iniciando sesión en UniSports...'
                 });
-                localStorage.setItem('token', response.data.access_token);
-                localStorage.setItem('rol', response.data.rol);
-                localStorage.setItem('uuid', response.data.uuid);
-                localStorage.setItem('nombres', response.data.nombres + " " + response.data.apellidos)
-                navigate('/athletes/dashboard');
+                
+                const setLogin = useAuthStore.getState().setLogin;
+                setLogin({
+                    uuid: response.data.uuid,
+                    nombres: response.data.nombres + " " + response.data.apellidos,
+                    rol: response.data.rol
+                });
 
+                if (response.data.rol === 'representante') {
+                    navigate('/athletes/dashboard');
+                } else if (response.data.rol === 'administrador') {
+                    navigate('/admin/dashboard');
+                } else if (response.data.rol === 'gestor') {
+                    navigate('/sports-admin/dashboard');
+                } else {
+                    navigate('/'); 
+                }
             }
 
         } catch (error: unknown) {

@@ -6,6 +6,7 @@ from uuid import UUID
 from ..schemas.representante_schema import representante_request, RepresentanteResponse
 from ..services.representante_service import represenante_service
 from ..schemas.response_schema import api_response
+from app.services.cuenta_service import cuenta_service
 
 class representante_controller:
     router = APIRouter(prefix="/representantes", tags=["Representantes"])
