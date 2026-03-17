@@ -12,6 +12,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { API_URL } from '../../../api/access';
 import { ITEMSPERPAGE } from '../../../consts/consts';
+import { ReportService } from '../../../services/reportService';
 
 
 type ViewMode = 'ATHLETES' | 'SCHOOLS';
@@ -62,6 +63,9 @@ const SportsAdminDashboard: React.FC = () => {
     const [selectedAthlete, setSelectedAthlete] = useState<IAthletes | null>(null);
     const [availableSchools, setAvailableSchools] = useState<IEscuela[]>([]);
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+
+    // Reports state
+    const [reportsLoading, setReportsLoading] = useState(false);
 
     const validationSchema = yup.object({
         nombres: yup.string().required("Los nombres son obligatorios").max(50, "Máximo 50 caracteres"),
@@ -238,9 +242,7 @@ const SportsAdminDashboard: React.FC = () => {
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#ef4444',
             confirmButtonText: 'Sí, remover',
-            cancelButtonText: 'Cancelar',
-            background: '#1a1d21',
-            color: '#ffffff'
+            cancelButtonText: 'Cancelar'
         });
 
         if (!result.isConfirmed) return;
@@ -273,9 +275,7 @@ const SportsAdminDashboard: React.FC = () => {
             confirmButtonColor: currentStatus ? '#ef4444' : '#10b981',
             cancelButtonColor: '#6b7280',
             confirmButtonText: currentStatus ? 'Sí, desactivar' : 'Sí, habilitar',
-            cancelButtonText: 'Cancelar',
-            background: '#1a1d21',
-            color: '#ffffff'
+            cancelButtonText: 'Cancelar'
         });
 
         if (!result.isConfirmed) return;
@@ -355,6 +355,46 @@ const SportsAdminDashboard: React.FC = () => {
         }
     };
 
+    // --- Report Handlers ---
+    const handleGenerateGeneralReport = async () => {
+        setReportsLoading(true);
+        try {
+            await ReportService.generateTotalInscriptionsReport();
+            toast.success("Reporte general generado");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al generar reporte general");
+        } finally {
+            setReportsLoading(false);
+        }
+    };
+
+    const handleGenerateSchoolStatsReport = async () => {
+        setReportsLoading(true);
+        try {
+            await ReportService.generateInscriptionsBySchoolReport();
+            toast.success("Reporte por escuelas generado");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al generar reporte por escuelas");
+        } finally {
+            setReportsLoading(false);
+        }
+    };
+
+    const handleGenerateStudentList = async (schoolUuid: string) => {
+        setReportsLoading(true);
+        try {
+            await ReportService.generateStudentsBySchoolReport(schoolUuid);
+            toast.success("Lista de estudiantes generada");
+        } catch (error) {
+            console.error(error);
+            toast.error("Error al generar lista de estudiantes");
+        } finally {
+            setReportsLoading(false);
+        }
+    };
+
     const handleAthleteSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setAthleteSearch(val);
@@ -413,9 +453,7 @@ const SportsAdminDashboard: React.FC = () => {
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#ef4444',
             confirmButtonText: 'Sí, guardar',
-            cancelButtonText: 'Cancelar',
-            background: '#1a1d21',
-            color: '#ffffff'
+            cancelButtonText: 'Cancelar'
         });
 
         if (!result.isConfirmed) return;
@@ -583,6 +621,25 @@ const SportsAdminDashboard: React.FC = () => {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleGenerateGeneralReport}
+                                        disabled={reportsLoading}
+                                        className="flex items-center gap-2 px-4 py-2 bg-surface-dark border border-gray-800 rounded-lg text-xs font-bold text-gray-300 hover:text-white hover:border-primary transition-all disabled:opacity-50"
+                                    >
+                                        <span className="material-icons-outlined text-sm text-primary">analytics</span>
+                                        {reportsLoading ? "Generando..." : "Reporte General"}
+                                    </button>
+                                    <button
+                                        onClick={handleGenerateSchoolStatsReport}
+                                        disabled={reportsLoading}
+                                        className="flex items-center gap-2 px-4 py-2 bg-surface-dark border border-gray-800 rounded-lg text-xs font-bold text-gray-300 hover:text-white hover:border-primary transition-all disabled:opacity-50"
+                                    >
+                                        <span className="material-icons-outlined text-sm text-primary">pie_chart</span>
+                                        {reportsLoading ? "Generando..." : "Estadísticas x Escuela"}
+                                    </button>
+                                </div>
                             </div>
                             <div className="bg-surface-dark rounded-xl border border-gray-800 shadow-xl overflow-hidden pt-4">
                                 <div className="px-6 mb-4 flex items-center justify-between">
@@ -705,6 +762,7 @@ const SportsAdminDashboard: React.FC = () => {
                                                     </TableCell>
                                                     <TableCell className="text-right">
                                                         <div className="flex items-center justify-end gap-2">
+                                                            <IconButton icon="description" title="Lista de Estudiantes (PDF)" variant="neutral" onClick={() => handleGenerateStudentList(s.uuid)} />
                                                             <IconButton icon="edit" title="Editar Escuela" variant="neutral" onClick={() => handleOpenSchoolModal(s)} />
                                                             <IconButton icon={s.estado ? "visibility_off" : "visibility"} title={s.estado ? "Ocultar de la oferta" : "Mostrar en la oferta"} variant={s.estado ? "danger" : "primary"} onClick={() => handleToggleSchoolStatus(s.uuid, s.estado)} />
                                                         </div>

@@ -69,6 +69,18 @@ class AthletesService {
             throw error;
         }
     }
+
+    static async getAllAthletes(skip: number = 0, limit: number = 1000): Promise<IAthletes[]> {
+        try {
+            const response = await methodGET<ApiResponse<any>>(`/participantes?skip=${skip}&limit=${limit}`);
+            // The backend returns a paginated object with 'items' or similar structure
+            // Based on the controller, it returns 'participantes_paginados' which likely has 'items'
+            return response.data?.items || [];
+        } catch (error) {
+            console.error("Error fetching all athletes:", error);
+            throw error;
+        }
+    }
 }
 
 export default AthletesService

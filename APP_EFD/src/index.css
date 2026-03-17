@@ -46,6 +46,7 @@
   
   --color-gray-800: var(--app-border);
   --color-gray-700: var(--app-border);
+  --color-gray-900: var(--app-input);
   
   --color-gray-500: var(--app-text-muted);
   --color-gray-400: var(--app-text-muted);
@@ -58,4 +59,42 @@ body {
   background-color: var(--app-background);
   color: var(--app-text);
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* SweetAlert2 Theme Overrides */
+.swal2-popup {
+  background-color: var(--app-surface) !important;
+  color: var(--app-text) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 1rem !important;
+}
+
+.swal2-title, .swal2-html-container {
+  color: var(--app-text) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--app-primary) !important;
+  color: var(--app-btn-text) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+.swal2-cancel {
+  background-color: transparent !important;
+  color: var(--app-text-muted) !important;
+  border: 1px solid var(--app-border) !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+}
+
+.swal2-cancel:hover {
+  background-color: var(--app-border) !important;
+  color: var(--app-text) !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: var(--app-primary) !important;
+  color: var(--app-primary) !important;
 }

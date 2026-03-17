@@ -210,9 +210,7 @@ export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender,
             confirmButtonColor: '#10b981',
             cancelButtonColor: '#ef4444',
             confirmButtonText: 'Sí, generar',
-            cancelButtonText: 'Cancelar',
-            background: '#1a1d21',
-            color: '#ffffff'
+            cancelButtonText: 'Cancelar'
           });
           if (result.isConfirmed) {
             onDownloadPdf?.();
