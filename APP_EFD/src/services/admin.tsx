@@ -35,11 +35,10 @@ export interface CreateAdminData {
 }
 
 const AdminService = {
-    getUsers: async (skip: number = 0, limit: number = 100, search: string = ''): Promise<PaginatedResponse<AdminUser>> => {
+    getUsers: async (skip: number = 0, limit: number = 100, search: string = '', tipoPersona: string = ''): Promise<PaginatedResponse<AdminUser>> => {
         try {
-            // Añadimos el query param de search
             const response = await methodGET<ApiResponse<PaginatedResponse<AdminUser>>>(
-                `/personas/?skip=${skip}&limit=${limit}&search=${search}`
+                `/personas/?skip=${skip}&limit=${limit}&search=${search}&tipo_persona=${tipoPersona}`
             );
             return response.data || { total: 0, items: [] };
         } catch (error) {
@@ -74,6 +73,16 @@ const AdminService = {
             return response.data || [];
         } catch (error) {
             console.error("Error fetching roles:", error);
+            return [];
+        }
+    },
+
+    getRolesAllow: async (): Promise<Role[]> => {
+        try {
+            const response = await methodGET<ApiResponse<Role[]>>('/roles/permitidos');
+            return response.data || [];
+        } catch (error) {
+            console.error("Error fetching roles allow:", error);
             return [];
         }
     },

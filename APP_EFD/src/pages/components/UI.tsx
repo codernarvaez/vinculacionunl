@@ -349,10 +349,10 @@ export const Modal: React.FC<{
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className={`bg-[#0d0f12] border border-gray-800 rounded-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${className}`}
+        className={`bg-surface-dark border border-gray-800 rounded-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-black/20">
+        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between bg-gray-800/20">
           <h3 className="text-lg font-display font-bold text-white uppercase tracking-tight flex items-center gap-2">
             <span className="w-1 h-5 bg-primary rounded-full"></span>
             {title}

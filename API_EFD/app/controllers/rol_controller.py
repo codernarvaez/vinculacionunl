@@ -24,3 +24,17 @@ class rol_controller:
             raise e
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+        
+    @router.get("/permitidos", response_model=api_response[list[RolResponse]], status_code=status.HTTP_200_OK)
+    def listar_roles_permitidos(db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["administrador"]))):
+        try:
+            resultado = rol_service.listar_roles_permitidos(db)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Roles permitidos listados exitosamente",
+                data=resultado
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")

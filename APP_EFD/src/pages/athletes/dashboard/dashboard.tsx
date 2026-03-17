@@ -143,7 +143,7 @@ const Dashboard: React.FC = () => {
                   <h4 className="text-xl font-display font-bold text-white uppercase tracking-tight">{school.nombre}</h4>
                   <p className="text-gray-400 text-sm line-clamp-2">{school.descripcion}</p>
                   <div className="flex flex-wrap gap-3 mt-4">
-                    <div className="px-3 py-1 bg-gray-900 border border-gray-800 rounded-full text-[10px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="px-3 py-1 bg-surface-dark border border-gray-700 rounded-full text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                       <span className="material-icons-outlined text-xs">child_care</span>
                       Rango: {school.ranInferior} - {school.ranSuperior} años
                     </div>
@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
               <span className="material-icons-outlined text-secondary">event_repeat</span>
               Actividades Programadas
             </h4>
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-900 px-3 py-1 rounded-full">Marzo 2026</span>
+            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-surface-dark border border-gray-700 px-3 py-1 rounded-full">Marzo 2026</span>
           </div>
 
           <div className="space-y-4">
@@ -186,7 +186,7 @@ const Dashboard: React.FC = () => {
               { day: '22', month: 'Mar', title: 'Torneo Inter-Escuelas', time: '08:00 - 14:00', type: 'Competencia', color: 'border-secondary' },
               { day: '25', month: 'Mar', title: 'Revisión Médica Mensual', time: '15:00 - 17:00', type: 'Salud', color: 'border-yellow-500' },
             ].map((event, i) => (
-              <div key={i} className={`flex items-center gap-4 p-4 rounded-xl bg-black/20 border-l-4 ${event.color} hover:bg-black/40 transition-colors`}>
+              <div key={i} className={`flex items-center gap-4 p-4 rounded-xl bg-gray-800/20 border-l-4 ${event.color} hover:bg-gray-800/40 transition-colors`}>
                 <div className="text-center min-w-[50px]">
                   <p className="text-xl font-display font-black text-white leading-none">{event.day}</p>
                   <p className="text-[10px] font-bold text-gray-500 uppercase">{event.month}</p>
@@ -241,7 +241,7 @@ const Dashboard: React.FC = () => {
     <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
 
       {/* Sidebar con más estilo */}
-      <aside className="w-64 flex flex-col bg-[#0d0f12] border-r border-gray-800/50 relative z-20">
+      <aside className="w-64 flex flex-col bg-surface-dark border-r border-gray-800/50 relative z-20">
         {/* Logo */}
         <div className="h-24 flex items-center px-8">
           <div className="flex items-center gap-3">
@@ -265,7 +265,7 @@ const Dashboard: React.FC = () => {
         </nav>
 
         {/* User Card en el Footer del Sidebar */}
-        <div className="p-4 border-t border-gray-800/50 bg-black/20">
+        <div className="p-4 border-t border-gray-800/50 bg-gray-800/20">
           <div className="flex items-center gap-3 mb-4 px-2">
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-0.5">
               <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">

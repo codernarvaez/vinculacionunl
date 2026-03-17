@@ -489,7 +489,7 @@ const SportsAdminDashboard: React.FC = () => {
 
     return (
         <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
-            <aside className="w-64 flex flex-col bg-[#0d0f12] border-r border-gray-800/50 relative z-20">
+            <aside className="w-64 flex flex-col bg-surface-dark border-r border-gray-800/50 relative z-20">
                 <div className="h-24 flex items-center px-8">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center border border-primary/30">
@@ -513,7 +513,7 @@ const SportsAdminDashboard: React.FC = () => {
                     </div>
                 </nav>
 
-                <div className="p-4 border-t border-gray-800/50 bg-black/20">
+                <div className="p-4 border-t border-gray-800/50 bg-gray-800/20">
                     <div className="flex items-center gap-3 mb-4 px-2">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-0.5">
                             <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">

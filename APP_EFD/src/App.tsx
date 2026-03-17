@@ -13,12 +13,16 @@ import Unauthorized from './pages/unauthorized/unauthorized';
 import NotFound from './pages/notfound/notfound';
 import './App.css';
 import { Toaster } from 'sonner';
-
+import { ThemeToggle } from './components/ThemeToggle';
+import { useTheme } from './components/ThemeProvider';
 
 function App() {
+  const { theme } = useTheme();
+
   return (
     <>
-      <Toaster position="top-right" richColors theme="dark" />
+      <Toaster position="top-right" richColors theme={theme} />
+      <ThemeToggle />
       <Router>
 
         <Routes>

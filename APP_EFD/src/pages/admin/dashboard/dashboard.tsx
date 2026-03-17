@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { SidebarItem, Table, TableHead, TableBody, TableRow, TableCell, Badge, IconButton, InputField, Modal, SelectField, PrimaryButton } from '../../../pages/components/UI';
 import { logout, getNamesCurrentUser } from '../../../services/auth';
-import AdminService, { type AdminUser, type Role } from '../../../services/admin';
+import AdminService, { type AdminUser, type Role, type CreateAdminData } from '../../../services/admin';
 import { toast } from 'sonner';
 import Swal from 'sweetalert2';
 import { ITEMSPERPAGE } from '../../../consts/consts';
@@ -18,31 +18,32 @@ const AdminDashboard: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [activeTab, setActiveTab] = useState<'admins' | 'representatives'>('admins');
     const itemsPerPage = ITEMSPERPAGE;
 
     // Modals state
-    // const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isRoleModalOpen, setIsRoleModalOpen] = useState(false);
     const [roles, setRoles] = useState<Role[]>([]);
     const [selectedUser, setSelectedUser] = useState<AdminUser | null>(null);
 
     // Schemas
-    // const createAdminSchema = yup.object({
-    //     nombres: yup.string().required("Los nombres son obligatorios"),
-    //     apellidos: yup.string().required("Los apellidos son obligatorios"),
-    //     correo: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
-    //     clave: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres").required("La contraseña es obligatoria")
-    // });
+    const createAdminSchema = yup.object({
+        nombres: yup.string().required("Los nombres son obligatorios"),
+        apellidos: yup.string().required("Los apellidos son obligatorios"),
+        correo: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
+        clave: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres").required("La contraseña es obligatoria")
+    });
 
     const roleSchema = yup.object({
         rol_uuid: yup.string().required("El rol es obligatorio")
     });
 
-    // // Forms Hooks
-    // const createForm = useForm<CreateAdminData>({
-    //     resolver: yupResolver(createAdminSchema),
-    //     defaultValues: { nombres: '', apellidos: '', correo: '', clave: '' }
-    // });
+    // Forms Hooks
+    const createForm = useForm<CreateAdminData>({
+        resolver: yupResolver(createAdminSchema),
+        defaultValues: { nombres: '', apellidos: '', correo: '', clave: '' }
+    });
 
     const roleForm = useForm<{ rol_uuid: string }>({
         resolver: yupResolver(roleSchema),
@@ -55,7 +56,10 @@ const AdminDashboard: React.FC = () => {
         setLoading(true);
         try {
             const skip = (currentPage - 1) * itemsPerPage;
-            const data = await AdminService.getUsers(skip, itemsPerPage, debouncedSearch);
+
+            const rolFilter = activeTab === 'admins' ? 'administrador' : 'representante';
+
+            const data = await AdminService.getUsers(skip, itemsPerPage, debouncedSearch, rolFilter);
             setUsers(data.items);
             setTotalUsers(data.total);
         } catch (error) {
@@ -64,11 +68,11 @@ const AdminDashboard: React.FC = () => {
         } finally {
             setLoading(false);
         }
-    }, [currentPage, itemsPerPage, debouncedSearch]);
+    }, [currentPage, itemsPerPage, debouncedSearch, activeTab]);
 
     useEffect(() => {
         fetchUsers();
-    }, [fetchUsers]);
+    }, [fetchUsers, activeTab]);
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -81,7 +85,7 @@ const AdminDashboard: React.FC = () => {
 
     const fetchRoles = useCallback(async () => {
         try {
-            const data = await AdminService.getRoles();
+            const data = await AdminService.getRolesAllow();
             setRoles(data);
         } catch (error) {
             console.error("Error fetching roles:", error);
@@ -98,21 +102,31 @@ const AdminDashboard: React.FC = () => {
         setIsRoleModalOpen(true);
     };
 
-    // const handleCreateAdmin = async (data: CreateAdminData) => {
-    //     try {
-    //         const success = await AdminService.createAdministrator(data);
-    //         if (success) {
-    //             toast.success("Administrador creado exitosamente.");
-    //             setIsCreateModalOpen(false);
-    //             createForm.reset();
-    //             fetchUsers();
-    //         } else {
-    //             toast.error("Error al crear administrador.");
-    //         }
-    //     } catch (error) {
-    //         toast.error("Error de conexión.");
-    //     }
-    // };
+    const handleCreateAdmin = async (data: CreateAdminData) => {
+        try {
+            const success = await AdminService.createAdministrator(data);
+            if (success) {
+                toast.success("Administrador creado exitosamente", {
+                    description: "La cuenta ha sido registrada en el sistema."
+                });
+                setIsCreateModalOpen(false);
+                createForm.reset();
+                fetchUsers();
+            } else {
+                toast.error("Error al crear administrador", {
+                    description: "No se pudo completar el registro. Intente nuevamente."
+                });
+            }
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error("Error al crear administrador", {
+                    description: error.message
+                });
+            } else {
+                toast.error("Error desconocido al crear administrador");
+            }
+        }
+    };
 
     const handleChangeRole = async (data: { rol_uuid: string }) => {
         if (!selectedUser) return;
@@ -120,14 +134,24 @@ const AdminDashboard: React.FC = () => {
         try {
             const success = await AdminService.changeUserRole(selectedUser.cuenta.uuid, data.rol_uuid);
             if (success) {
-                toast.success("Rol actualizado exitosamente.");
+                toast.success("Rol actualizado exitosamente", {
+                    description: "El nuevo rol ha sido asignado correctamente."
+                });
                 setIsRoleModalOpen(false);
                 fetchUsers();
             } else {
-                toast.error("Error al actualizar el rol.");
+                toast.error("Error al actualizar el rol", {
+                    description: "No se pudo cambiar el rol del usuario."
+                });
             }
-        } catch (error) {
-            toast.error("Error de conexión.");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error("Error al actualizar el rol", {
+                    description: error.message
+                });
+            } else {
+                toast.error("Error desconocido al actualizar el rol");
+            }
         }
     };
 
@@ -154,12 +178,22 @@ const AdminDashboard: React.FC = () => {
             if (success) {
                 setUsers(users.map(u => u.uuid === uuid ? { ...u, cuenta: { ...u.cuenta, estado: newStatus } } : u));
                 fetchUsers();
-                toast.success(newStatus ? 'Usuario habilitado.' : 'Usuario deshabilitado.');
+                toast.success(newStatus ? 'Usuario habilitado' : 'Usuario deshabilitado', {
+                    description: `El acceso de ${userName} ha sido actualizado.`
+                });
             } else {
-                toast.error("No se pudo cambiar el estado.");
+                toast.error("No se pudo cambiar el estado", {
+                    description: "Ocurrió un problema al actualizar la cuenta."
+                });
             }
-        } catch (e) {
-            toast.error("Error de conexión.");
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error("Error al cambiar estado", {
+                    description: error.message
+                });
+            } else {
+                toast.error("Error de conexión");
+            }
         }
     };
 
@@ -178,7 +212,7 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
             {/* Sidebar con más estilo */}
-            <aside className="w-64 flex flex-col bg-[#0d0f12] border-r border-gray-800/50 relative z-20">
+            <aside className="w-64 flex flex-col bg-surface-dark border-r border-gray-800/50 relative z-20">
                 {/* Logo */}
                 <div className="h-24 flex items-center px-8">
                     <div className="flex items-center gap-3">
@@ -197,12 +231,10 @@ const AdminDashboard: React.FC = () => {
                         <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em]">Panel Control</p>
                     </div>
                     <SidebarItem icon="manage_accounts" label="Gestión de Cuentas" active />
-                    <SidebarItem icon="analytics" label="Estadísticas Generales" />
-                    <SidebarItem icon="settings" label="Configuración del Sistema" />
                 </nav>
 
                 {/* User Card en el Footer del Sidebar */}
-                <div className="p-4 border-t border-gray-800/50 bg-black/20">
+                <div className="p-4 border-t border-gray-800/50 bg-gray-800/20">
                     <div className="flex items-center gap-3 mb-4 px-2">
                         <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-0.5">
                             <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center overflow-hidden">
@@ -232,20 +264,57 @@ const AdminDashboard: React.FC = () => {
                             </h2>
                             <p className="text-gray-500 text-sm mt-1">Administre las cuentas del sistema, gestione roles y accesos.</p>
                         </div>
-
                     </div>
 
-                    {/* Search and Filters */}
-                    <div className="flex flex-col sm:flex-row justify-between items-end gap-4 mb-6">
-                        <div className="w-full sm:w-96">
-                            <InputField
-                                id="search"
-                                label="Buscar Usuario"
-                                placeholder="Filtrar por nombre..."
-                                icon="search"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                    {/* Tabs and Search */}
+                    <div className="flex flex-col gap-6 mb-8">
+                        {/* Tabs Interface */}
+                        <div className="flex items-center gap-1 bg-surface-dark p-1 rounded-xl border border-gray-800 w-fit">
+                            <button
+                                onClick={() => { setActiveTab('admins'); setCurrentPage(1); }}
+                                className={`px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'admins'
+                                    ? 'bg-primary text-black shadow-lg shadow-primary/20'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
+                                    }`}
+                            >
+                                Administradores
+                            </button>
+                            <button
+                                onClick={() => { setActiveTab('representatives'); setCurrentPage(1); }}
+                                className={`px-6 py-2.5 rounded-lg text-xs font-bold uppercase tracking-widest transition-all ${activeTab === 'representatives'
+                                    ? 'bg-primary text-black shadow-lg shadow-primary/20'
+                                    : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800'
+                                    }`}
+                            >
+                                Representantes
+                            </button>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row justify-between items-end gap-4">
+                            <div className="w-full sm:w-96">
+                                <InputField
+                                    id="search"
+                                    label={`Buscar en ${activeTab === 'admins' ? 'Administradores' : 'Representantes'}`}
+                                    placeholder="Filtrar por nombre..."
+                                    icon="search"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+
+                            <div className="h-[42px] flex items-center"> {/* Altura fija para alinear con el input */}
+                                {activeTab === 'admins' && (
+                                    <PrimaryButton
+                                        onClick={() => setIsCreateModalOpen(true)}
+                                        className="py-2.5 px-6 text-[10px] uppercase tracking-wider"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <span className="material-icons text-sm">add</span>
+                                            Nuevo Administrador
+                                        </div>
+                                    </PrimaryButton>
+                                )}
+                            </div>
                         </div>
                     </div>
 
@@ -317,11 +386,13 @@ const AdminDashboard: React.FC = () => {
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex items-center justify-end gap-2">
-                                                    <IconButton
-                                                        icon="manage_accounts"
-                                                        title="Cambiar Rol"
-                                                        onClick={() => handleOpenRoleModal(user)}
-                                                    />
+                                                    {activeTab === 'admins' && (
+                                                        <IconButton
+                                                            icon="manage_accounts"
+                                                            title="Cambiar Rol"
+                                                            onClick={() => handleOpenRoleModal(user)}
+                                                        />
+                                                    )}
                                                     <IconButton
                                                         icon={user.cuenta.estado ? "block" : "check_circle"}
                                                         variant={user.cuenta.estado ? "danger" : "primary"}
@@ -384,7 +455,9 @@ const AdminDashboard: React.FC = () => {
                             {...roleForm.register("rol_uuid")}
                             id="role"
                             label="Seleccionar Rol"
-                            options={roles.map(r => ({ value: r.uuid, label: r.nombre }))}
+                            options={roles
+                                .filter(r => r.nombre !== 'REPRESENTANTE')
+                                .map(r => ({ value: r.uuid, label: r.nombre }))}
                             error={roleForm.formState.errors.rol_uuid?.message}
                         />
 
@@ -395,6 +468,55 @@ const AdminDashboard: React.FC = () => {
                         </div>
                     </form>
                 )}
+            </Modal>
+
+            {/* Modal: Crear Administrador */}
+            <Modal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                title="Crear Nuevo Administrador"
+            >
+                <form onSubmit={createForm.handleSubmit(handleCreateAdmin)} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <InputField
+                            {...createForm.register("nombres")}
+                            id="nombres"
+                            label="Nombres"
+                            placeholder="Ej. Juan"
+                            error={createForm.formState.errors.nombres?.message}
+                        />
+                        <InputField
+                            {...createForm.register("apellidos")}
+                            id="apellidos"
+                            label="Apellidos"
+                            placeholder="Ej. Pérez"
+                            error={createForm.formState.errors.apellidos?.message}
+                        />
+                    </div>
+                    <InputField
+                        {...createForm.register("correo")}
+                        id="correo"
+                        label="Correo Electrónico"
+                        type="email"
+                        placeholder="admin@ejemplo.com"
+                        icon="email"
+                        error={createForm.formState.errors.correo?.message}
+                    />
+                    <InputField
+                        {...createForm.register("clave")}
+                        id="clave"
+                        label="Contraseña"
+                        type="password"
+                        placeholder="••••••••"
+                        icon="lock"
+                        error={createForm.formState.errors.clave?.message}
+                    />
+                    <div className="pt-4 ">
+                        <PrimaryButton type="submit" className="w-full">
+                            Crear Administrador
+                        </PrimaryButton>
+                    </div>
+                </form>
             </Modal>
         </div>
     );

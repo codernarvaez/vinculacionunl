@@ -10,9 +10,15 @@ class persona_controller:
     router = APIRouter(prefix="/personas", tags=["Personas"])
 
     @router.get("/", response_model=api_response[personas_paginadas], status_code=status.HTTP_200_OK)
-    def listar_personas(skip: int = 0, limit: int = 100, search: str = None, db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["administrador", "gestor"]))):
+    def listar_personas(
+    skip: int = 0,
+    limit: int = 100,
+    search: str = None,
+    tipo_persona: str = None,
+    db: Session = Depends(get_db),
+    current_user: Cuenta = Depends(cuenta_service.RoleChecker(["administrador", "gestor"]))):
         try:
-            resultado = persona_service.listar_personas(db, skip=skip, limit=limit, search=search)
+            resultado = persona_service.listar_personas(db, skip=skip, limit=limit, search=search, tipo_persona=tipo_persona)
             return api_response(
                 code=status.HTTP_200_OK,
                 msg="Personas listadas exitosamente",
