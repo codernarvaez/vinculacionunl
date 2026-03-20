@@ -16,11 +16,11 @@ interface UserState {
 
 export const useAuthStore = create<UserState>()(
   persist(
-    (set) => ({
+    (set: (state: Partial<UserState>) => void) => ({
       user: null,
       isAuth: false,
 
-      setLogin: (userData) => set({
+      setLogin: (userData: UserData) => set({
         user: userData,
         isAuth: true
       }),

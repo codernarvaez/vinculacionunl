@@ -440,6 +440,11 @@ const Home: React.FC = () => {
               ACTÍVATE <span className="text-primary">UNL</span>
             </span>
           </div>
+          <div className="flex flex-col md:flex-row items-center gap-4 text-sm font-medium">
+            <Link to="/politica-cookies" className="text-gray-400 hover:text-white transition-colors">Política de Cookies</Link>
+            <span className="hidden md:block text-gray-700">|</span>
+            <Link to="/politica-privacidad" className="text-gray-400 hover:text-white transition-colors">Protección de Datos Personales - LOPDP</Link>
+          </div>
           <div className="text-gray-500 text-xs font-medium space-y-1 text-center md:text-right">
             <p>© {new Date().getFullYear()} Universidad Nacional de Loja. Todos los derechos reservados.</p>
             <p>Carrera de Pedagogía de la Actividad Física y Deporte.</p>

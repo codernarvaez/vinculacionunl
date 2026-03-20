@@ -11,6 +11,9 @@ import PrivateRoute from './components/PrivateRoute';
 import PublicRoute from './components/PublicRoute';
 import Unauthorized from './pages/unauthorized/unauthorized';
 import NotFound from './pages/notfound/notfound';
+import PrivacyPolicy from './pages/legal/PrivacyPolicy';
+import CookiePolicy from './pages/legal/CookiePolicy';
+import CookieBanner from './components/CookieBanner';
 import './App.css';
 import { Toaster } from 'sonner';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -24,6 +27,7 @@ function App() {
       <Toaster position="top-right" richColors theme={theme} />
       <ThemeToggle />
       <Router>
+        <CookieBanner />
 
         <Routes>
           <Route path="/" element={<Home />} />
@@ -38,6 +42,8 @@ function App() {
             </PublicRoute>
           } />
           <Route path="/unauthorized" element={<Unauthorized />} />
+          <Route path="/politica-privacidad" element={<PrivacyPolicy />} />
+          <Route path="/politica-cookies" element={<CookiePolicy />} />
           <Route path="*" element={<NotFound />} />
           
           <Route path="/athletes/register" element={
