@@ -153,7 +153,7 @@ const Register: React.FC = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/60"></div>
 
                         <div className="relative z-10">
-                            <div className="h-12 w-12 bg-primary rounded-lg flex items-center justify-center mb-6">
+                            <div className="h-12 w-12 bg-black rounded-lg flex items-center justify-center mb-6">
                                 <span className="material-icons text-white">person_add</span>
                             </div>
                             <h2 className="text-2xl font-bold text-white">Bienvenido</h2>

@@ -60,8 +60,8 @@ const ParticipantRegister: React.FC = () => {
     condicionMedica: yup
       .string()
       .max(255, "Máximo 255 caracteres")
-      .nullable() 
-      .transform((value) => (value === "" ? null : value)) 
+      .nullable()
+      .transform((value) => (value === "" ? null : value))
       .default(null),
     foto: yup.mixed<File>().required("La foto es obligatoria"),
     aceptoTerminos: yup.boolean().oneOf([true], "Debe aceptar los términos").required()
@@ -187,7 +187,7 @@ const ParticipantRegister: React.FC = () => {
       <nav className="bg-surface-dark border-b border-gray-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <span className="material-icons text-primary">sports_soccer</span>
-          <span className="font-display text-2xl font-bold tracking-tighter">UNISPORTS<span className="text-primary">KIDS</span></span>
+          <span className="font-display text-2xl font-bold tracking-tighter">ACTÍVATE <span className="text-primary">UNL</span></span>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium hidden sm:block text-gray-300">{getNamesCurrentUser()}</span>
