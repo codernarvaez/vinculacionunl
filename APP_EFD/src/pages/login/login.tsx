@@ -52,7 +52,7 @@ const Login: React.FC = () => {
                 toast.success(`¡Bienvenido, ${response.data.nombres}!`, {
                     description: 'Iniciando sesión en UniSports...'
                 });
-                
+
                 const setLogin = useAuthStore.getState().setLogin;
                 setLogin({
                     uuid: response.data.uuid,
@@ -67,7 +67,7 @@ const Login: React.FC = () => {
                 } else if (response.data.rol === 'gestor') {
                     navigate('/sports-admin/dashboard');
                 } else {
-                    navigate('/'); 
+                    navigate('/');
                 }
             }
 
@@ -96,7 +96,7 @@ const Login: React.FC = () => {
                 {/* Logo Sección */}
                 <div className="text-center mb-8">
                     <h1 className="font-display text-5xl font-bold tracking-wider uppercase">
-                        Uni<span className="text-primary">Sports</span>
+                        Actívate <span className="text-primary">UNL</span>
                     </h1>
                     <div className="h-1 w-20 bg-secondary mx-auto mt-2"></div>
                 </div>

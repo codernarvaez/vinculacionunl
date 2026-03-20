@@ -32,14 +32,16 @@ const Home: React.FC = () => {
             <span className="material-icons-outlined">sports_soccer</span>
           </div>
           <span className="text-xl font-bold tracking-tight">
-            Campus Deportivo <span className="text-primary font-normal">UNL</span>
+            ACTÍVATE <span className="text-primary font-bold">UNL</span>
           </span>
         </div>
 
         <div className="hidden md:flex items-center gap-8 text-sm text-gray-300 font-medium">
           <a href="#inicio" className="hover:text-white transition-colors duration-200">Inicio</a>
+          <a href="#mision" className="hover:text-white transition-colors duration-200">Misión</a>
+          <a href="#objetivos" className="hover:text-white transition-colors duration-200">Objetivos</a>
           <a href="#escuelas" className="hover:text-white transition-colors duration-200">Escuelas</a>
-          <a href="#info" className="hover:text-white transition-colors duration-200">Información</a>
+          <a href="#contactanos" className="hover:text-white transition-colors duration-200">Contactanos</a>
         </div>
 
         <div className="flex gap-4 items-center">
@@ -158,7 +160,7 @@ const Home: React.FC = () => {
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-3">
                 <span className="material-icons-outlined text-primary text-2xl">location_on</span>
-                <h2 className="text-2xl font-bold tracking-tight">Campus Deportivo UNL</h2>
+                <h2 className="text-2xl font-bold tracking-tight">Activate UNL</h2>
               </div>
               <span className="text-sm font-medium text-gray-400">Av. Universitaria, Loja</span>
             </div>

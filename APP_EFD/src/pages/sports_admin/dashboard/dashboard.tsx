@@ -534,7 +534,7 @@ const SportsAdminDashboard: React.FC = () => {
                             <span className="material-icons text-primary text-2xl">sports</span>
                         </div>
                         <h1 className="text-lg font-display font-black tracking-tighter italic">
-                            UNI<span className="text-primary font-bold">SPORTS</span>
+                            ACTÍVATE <span className="text-primary font-bold">UNL</span>
                         </h1>
                     </div>
                 </div>

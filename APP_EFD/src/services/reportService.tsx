@@ -55,6 +55,7 @@ export class ReportService {
     }
 
     static async generateTotalInscriptionsReport() {
+        const totalInscriptions = await AthletesService.getInscriptionsTotal();
         const athletes = await AthletesService.getAllAthletes();
         const doc = this.initDoc('Reporte General de Inscripciones');
 
@@ -74,8 +75,8 @@ export class ReportService {
             startY: y,
             head: [['Concepto', 'Total']],
             body: [
-                ['Total de Estudiantes Inscritos', athletes.length.toString()],
-                ['Inscripciones Activas', athletes.length.toString()],
+                ['Total de Estudiantes Inscritos', totalInscriptions.toString()],
+                ['Inscripciones Activas', totalInscriptions.toString()],
                 ['Escuelas con Registros', new Set(athletes.map(a => a.escuelas?.[0]?.uuid)).size.toString()]
             ],
             theme: 'striped',

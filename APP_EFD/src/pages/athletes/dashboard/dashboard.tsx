@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
               condition={athlete.condicionMedica || "Ninguna"}
               status="Activo"
               img={API_URL + "/" + athlete.foto || "https://via.placeholder.com/150"}
-              gradient="from-emerald-950 to-background-dark"
+              gradient="bg-primary"
               uuid_participante={athlete.uuid}
               onDownloadPdf={() => {
                 toast.promise(generateAthletePdf(athlete), {
@@ -166,77 +166,6 @@ const Dashboard: React.FC = () => {
     </div>
   );
 
-  const renderCalendar = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      {/* Próximas Actividades */}
-      <div className="lg:col-span-2 space-y-6">
-        <div className="bg-surface-dark p-6 rounded-2xl border border-gray-800 overflow-hidden relative">
-          <div className="flex items-center justify-between mb-8">
-            <h4 className="text-lg font-display font-bold text-white flex items-center gap-2">
-              <span className="material-icons-outlined text-secondary">event_repeat</span>
-              Actividades Programadas
-            </h4>
-            <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-surface-dark border border-gray-700 px-3 py-1 rounded-full">Marzo 2026</span>
-          </div>
-
-          <div className="space-y-4">
-            {[
-              { day: '15', month: 'Mar', title: 'Entrenamiento General', time: '16:00 - 18:00', type: 'Práctica', color: 'border-primary' },
-              { day: '18', month: 'Mar', title: 'Charla Técnica de Nutrición', time: '10:00 - 11:30', type: 'Educativo', color: 'border-blue-500' },
-              { day: '22', month: 'Mar', title: 'Torneo Inter-Escuelas', time: '08:00 - 14:00', type: 'Competencia', color: 'border-secondary' },
-              { day: '25', month: 'Mar', title: 'Revisión Médica Mensual', time: '15:00 - 17:00', type: 'Salud', color: 'border-yellow-500' },
-            ].map((event, i) => (
-              <div key={i} className={`flex items-center gap-4 p-4 rounded-xl bg-gray-800/20 border-l-4 ${event.color} hover:bg-gray-800/40 transition-colors`}>
-                <div className="text-center min-w-[50px]">
-                  <p className="text-xl font-display font-black text-white leading-none">{event.day}</p>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase">{event.month}</p>
-                </div>
-                <div className="h-8 w-px bg-gray-800"></div>
-                <div className="flex-1">
-                  <h5 className="text-sm font-bold text-white">{event.title}</h5>
-                  <div className="flex items-center gap-3 mt-1 text-[10px] text-gray-500 font-medium uppercase tracking-tight">
-                    <span className="flex items-center gap-1"><span className="material-icons-outlined text-xs">schedule</span> {event.time}</span>
-                    <span className="flex items-center gap-1"><span className="material-icons-outlined text-xs">label</span> {event.type}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Avisos Importantes */}
-      <div className="space-y-6">
-        <div className="bg-secondary/5 p-6 rounded-2xl border border-secondary/20 border-dotted">
-          <h4 className="text-sm font-bold text-secondary uppercase tracking-widest mb-4 flex items-center gap-2">
-            <span className="material-icons-outlined">notifications_active</span>
-            Avisos Pendientes
-          </h4>
-          <ul className="space-y-4">
-            <li className="flex gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0"></span>
-              <p className="text-xs text-gray-300 leading-relaxed"><span className="font-bold text-white">Seguro Médico:</span> favor actualizar documentos antes del 20 de marzo.</p>
-            </li>
-            <li className="flex gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-secondary mt-1.5 shrink-0"></span>
-              <p className="text-xs text-gray-300 leading-relaxed"><span className="font-bold text-white">Uniforme:</span> El nuevo kit está disponible para retiro en oficinas centrales.</p>
-            </li>
-          </ul>
-        </div>
-
-        <div className="bg-primary/5 p-6 rounded-2xl border border-primary/20 border-dotted">
-          <h4 className="text-sm font-bold text-primary uppercase tracking-widest mb-4 flex items-center gap-2">
-            <span className="material-icons-outlined">info</span>
-            Tips de Rendimiento
-          </h4>
-          <p className="text-xs text-gray-400 italic leading-relaxed">
-            "La hidratación constante es clave para la recuperación muscular después de cada entrenamiento."
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="flex h-screen bg-background-dark text-white font-body overflow-hidden">
 
@@ -261,7 +190,6 @@ const Dashboard: React.FC = () => {
           </div>
           <SidebarItem icon="groups" label="Mis Participantes" active={activeView === 'participants'} onClick={() => setActiveView('participants')} />
           <SidebarItem icon="school" label="Escuelas" active={activeView === 'schools'} onClick={() => setActiveView('schools')} />
-          <SidebarItem icon="calendar_today" label="Calendario" active={activeView === 'calendar'} onClick={() => setActiveView('calendar')} />
         </nav>
 
         {/* User Card en el Footer del Sidebar */}
@@ -323,7 +251,6 @@ const Dashboard: React.FC = () => {
             <>
               {activeView === 'participants' && renderParticipants()}
               {activeView === 'schools' && renderSchools()}
-              {activeView === 'calendar' && renderCalendar()}
             </>
           )}
         </div>

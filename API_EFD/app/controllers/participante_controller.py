@@ -196,3 +196,17 @@ class participante_controller:
             raise e
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+        
+    @router.get("/inscripciones/total", response_model=api_response[int], status_code=status.HTTP_200_OK)
+    def listar_inscripciones_numero_total(db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["gestor"]))):
+        try:
+            inscripciones = participante_service.listar_inscripciones_numero_total(db)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg="Inscripciones totales obtenidas exitosamente",
+                data=inscripciones
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")

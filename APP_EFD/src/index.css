@@ -7,30 +7,42 @@
   --app-surface: #18181b;
   --app-background: #0f0f0f;
   --app-text: #f3f4f6;
-  --app-input: #111827; 
+  --app-input: #111827;
   --app-border: #1f2937;
   --app-btn-text: #000000;
   --app-bg-black: #000000;
   --app-text-muted: #9ca3af;
   --app-text-muted-darker: #6b7280;
-  --app-text-lighter: #d1d5db; /* gray-300 eq */
+  --app-text-lighter: #d1d5db;
+  /* gray-300 eq */
   color-scheme: dark;
 }
 
 :root[data-theme="light"] {
   /* Light scheme based on user requirements */
-  --app-primary: #006400; /* Emerald Deep */
-  --app-secondary: #D90429; /* Deep Crimson */
-  --app-surface: #ffffff; /* Clean white for cards */
-  --app-background: #F8F9FA; /* Ghost White */
-  --app-text: #2B2D42; /* Space Blue */
-  --app-input: #ffffff; 
-  --app-border: #e5e7eb; /* gray-200 eq */
-  --app-btn-text: #ffffff; /* White text for buttons on dark green */
-  --app-bg-black: #f3f4f6; /* bg-black map for light mode backgrounds */
-  --app-text-muted: #6b7280; /* text-gray-500 eq */
-  --app-text-muted-darker: #4b5563; /* text-gray-600 eq */
-  --app-text-lighter: #2B2D42; /* Space Blue eq */
+  --app-primary: #D90429;
+  /* Emerald Deep */
+  --app-secondary: #000;
+  /* Deep Crimson */
+  --app-surface: #ffffff;
+  /* Clean white for cards */
+  --app-background: #F8F9FA;
+  /* Ghost White */
+  --app-text: #2B2D42;
+  /* Space Blue */
+  --app-input: #ffffff;
+  --app-border: #e5e7eb;
+  /* gray-200 eq */
+  --app-btn-text: #ffffff;
+  /* White text for buttons on dark green */
+  --app-bg-black: #f3f4f6;
+  /* bg-black map for light mode backgrounds */
+  --app-text-muted: #6b7280;
+  /* text-gray-500 eq */
+  --app-text-muted-darker: #4b5563;
+  /* text-gray-600 eq */
+  --app-text-lighter: #2B2D42;
+  /* Space Blue eq */
   color-scheme: light;
 }
 
@@ -40,17 +52,17 @@
   --color-surface-dark: var(--app-surface);
   --color-background-dark: var(--app-background);
   --color-input-dark: var(--app-input);
-  
+
   --color-white: var(--app-text);
   --color-black: var(--app-btn-text);
-  
+
   --color-gray-800: var(--app-border);
   --color-gray-700: var(--app-border);
   --color-gray-900: var(--app-input);
-  
+
   --color-gray-500: var(--app-text-muted);
   --color-gray-400: var(--app-text-muted);
-  
+
   --color-gray-300: var(--app-text-lighter);
   --color-gray-200: var(--app-text-lighter);
 }
@@ -69,7 +81,8 @@ body {
   border-radius: 1rem !important;
 }
 
-.swal2-title, .swal2-html-container {
+.swal2-title,
+.swal2-html-container {
   color: var(--app-text) !important;
 }
 

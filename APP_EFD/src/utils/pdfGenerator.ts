@@ -10,11 +10,11 @@ export const generateAthletePdf = async (athlete: IAthletes) => {
         format: [85.6, 54]
     });
 
-    const primaryColor = '#10b981'; // Esmeralda
-    const darkBg = '#0d0f12';
-    const surfaceColor = '#1a1d21';
-    const textColor = '#FFFFFF';
-    const subTextColor = '#9ca3af';
+    const primaryColor = '#D90429'; //gris
+    const darkBg = '#fff';
+    const surfaceColor = '#fff';
+    const textColor = '#000';
+    const subTextColor = '#02051A';
 
     // --- Capa Base (Fondo) ---
     doc.setFillColor(darkBg);
@@ -87,10 +87,11 @@ export const generateAthletePdf = async (athlete: IAthletes) => {
 
     drawInfo('Cédula de Identidad', athlete.cedula || '0000000000', 30);
     drawInfo('Escuela Deportiva', athlete.escuelas?.[0]?.nombre || 'Sin escuela asignada', 38);
+    drawInfo('Categoría', athlete.escuelas?.[0]?.ranInferior + ' - ' + athlete.escuelas?.[0]?.ranSuperior, 46);
 
 
     doc.setTextColor(subTextColor);
-    doc.text('SISTEMA DE GESTIÓN UNISPORTS', 79, 50, { align: 'right' });
+    doc.text('ACTIVATE UNL', 79, 50, { align: 'right' });
 
     // Descarga
     doc.save(`ID_${athlete.cedula}_${athlete.apellidos}.pdf`);

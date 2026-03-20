@@ -16,6 +16,16 @@ class participante_service:
 
     def inscribir_participante_a_escuela(db: Session, participante_data):
         try:
+            participante_existente = db.query(Participante).filter(
+                Participante.cedula == participante_data.cedula
+            ).first()
+            
+            if participante_existente:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, 
+                    detail="El participante ya consta como registrado con esta cedula"
+                )
+
             UPLOAD_DIR = "public/uploads"
             if not os.path.exists(UPLOAD_DIR):
                 os.makedirs(UPLOAD_DIR)
@@ -27,16 +37,35 @@ class participante_service:
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(participante_data.foto.file, buffer)
 
-            representante_uuid_str = str(participante_data.representante_uuid)
-
             representante = db.query(Representante).filter(
-                Representante.uuid == representante_uuid_str
+                Representante.uuid == str(participante_data.representante_uuid)
             ).first()
 
             if not representante:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Representante no encontrado")
 
-            participante = Participante(
+            escuela = db.query(Escuela).filter(
+                Escuela.uuid == str(participante_data.escuela_uuid)
+            ).first()
+
+            if not escuela:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Escuela no encontrada")
+
+            today = date.today()
+            edad_participante = today.year - participante_data.fechaNac.year - (
+                (today.month, today.day) < (participante_data.fechaNac.month, participante_data.fechaNac.day)
+            )
+
+            if not (escuela.ranInferior <= edad_participante <= escuela.ranSuperior):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, 
+                    detail=f"El participante tiene {edad_participante} años y no cumple con el rango ({escuela.ranInferior}-{escuela.ranSuperior})"
+                )
+
+            if not escuela.estado:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La escuela no está activa")
+
+            nuevo_participante = Participante(
                 nombres=participante_data.nombres,
                 apellidos=participante_data.apellidos,
                 cedula=participante_data.cedula,
@@ -48,59 +77,22 @@ class participante_service:
                 representante_id=representante.id
             )
 
-            db.add(participante)
+            db.add(nuevo_participante)
             db.flush()
-            
-            escuela_uuid_str = str(participante_data.escuela_uuid)
-            escuela = db.query(Escuela).filter(
-                Escuela.uuid == escuela_uuid_str
-            ).first()
 
-            if not escuela:
-                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Escuela no encontrada")
-
-            today = date.today()
-            edad_participante = today.year - participante.fechaNac.year - (
-                (today.month, today.day) < (participante.fechaNac.month, participante.fechaNac.day)
+            stmt = inscripciones.insert().values(
+                participante_id=nuevo_participante.id, 
+                escuela_id=escuela.id
             )
-
-            if not (escuela.ranInferior <= edad_participante <= escuela.ranSuperior):
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, 
-                    detail=f"El participante tiene {edad_participante} años y no cumple con el rango ({escuela.ranInferior}-{escuela.ranSuperior})"
-                )
-            # Verificar si la escuela está activa
-            if not escuela.estado:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La escuela no está activa para inscripciones")
-            
-            a_participante = db.query(Participante).filter(Participante.cedula == participante.cedula).first()
-
-            # Verificar que el participante no esté inscrito en otra escuela
-            inscripcion_existente = db.query(inscripciones).filter(
-                inscripciones.c.participante_id == a_participante.id,
-                inscripciones.c.estado == True
-            ).first()
-
-            if inscripcion_existente:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El participante ya está inscrito en otra escuela")
-
-            # Verificar si el participante ya está inscrito en la escuela
-            inscripcion_existente = db.query(inscripciones).filter(
-                inscripciones.c.participante_id == participante.id,
-                inscripciones.c.escuela_id == escuela.id
-            ).first()
-
-            if inscripcion_existente:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="El participante ya está inscrito en esta escuela")
-
-            # Inscribir al participante en la escuela
-            stmt = inscripciones.insert().values(participante_id=participante.id, escuela_id=escuela.id)
             db.execute(stmt)
+            
             db.commit()
+            return nuevo_participante
 
-            return participante
         except Exception as e:
             db.rollback()
+            if 'file_path' in locals() and os.path.exists(file_path):
+                os.remove(file_path)
             print(f"Log del error: {e}")
             raise e
     
@@ -317,5 +309,16 @@ class participante_service:
             return participante
         except Exception as e:
             db.rollback()
+            print(f"Log del error: {e}")
+            raise e
+
+    
+    def listar_inscripciones_numero_total(db: Session):
+        
+        try:
+            from app.models.inscripciones import inscripciones
+            inscripciones = db.query(inscripciones).count()
+            return inscripciones
+        except Exception as e:
             print(f"Log del error: {e}")
             raise e

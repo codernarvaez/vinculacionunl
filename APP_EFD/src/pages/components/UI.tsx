@@ -70,9 +70,8 @@ export const SelectField: React.FC<{
         id={id}
         name={id}
         {...props}
-        className={`block w-full px-3 py-2.5 border ${
-          error ? "border-red-500" : "border-gray-800"
-        } rounded bg-input-dark text-white text-sm outline-none focus:ring-1 focus:ring-primary focus:border-primary transition duration-200 appearance-none cursor-pointer hover:bg-opacity-80`}
+        className={`block w-full px-3 py-2.5 border ${error ? "border-red-500" : "border-gray-800"
+          } rounded bg-input-dark text-white text-sm outline-none focus:ring-1 focus:ring-primary focus:border-primary transition duration-200 appearance-none cursor-pointer hover:bg-opacity-80`}
       >
         <option value="" className="bg-surface-dark">Seleccionar...</option>
         {options.map((opt) => (
@@ -81,7 +80,7 @@ export const SelectField: React.FC<{
           </option>
         ))}
       </select>
-      
+
       <span className="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none text-lg group-focus-within:text-primary transition-colors">
         expand_more
       </span>
@@ -94,15 +93,14 @@ export const SelectField: React.FC<{
     </div>
   </div>
 );
-export const TextAreaField: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string, error?: string }> = ({ label, id, error,  ...props }) => (
+export const TextAreaField: React.FC<React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string, error?: string }> = ({ label, id, error, ...props }) => (
   <div className="space-y-1.5 w-full text-left">
     <label className="text-xs font-bold text-gray-400 uppercase tracking-wider" htmlFor={id}>{label}</label>
     <textarea
       id={id}
       {...props}
-      className={`block w-full px-3 py-2.5 border ${
-        error ? "border-red-500" : "border-gray-800"
-      } rounded bg-input-dark text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-200`}
+      className={`block w-full px-3 py-2.5 border ${error ? "border-red-500" : "border-gray-800"
+        } rounded bg-input-dark text-white placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-200`}
     />
     {error && (
       <div className="text-[10px] font-bold text-red-500 mt-1">
@@ -135,13 +133,13 @@ export const StatCard = ({ icon, label, value, colorClass }: { icon: string, lab
 
 // --- Item del Menú Lateral ---
 export const SidebarItem = ({ icon, label, active = false, onClick }: { icon: string, label: string, active?: boolean, onClick?: () => void }) => (
-  <button 
+  <button
     onClick={onClick}
     className={`
     w-full group flex items-center px-4 py-3 rounded-lg transition-all duration-200
-    ${active 
-      ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]' 
-      : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 border border-transparent'}
+    ${active
+        ? 'bg-primary/10 text-primary border border-primary/20 shadow-[0_0_15px_rgba(34,197,94,0.1)]'
+        : 'text-gray-400 hover:bg-gray-800/50 hover:text-gray-200 border border-transparent'}
   `}>
     <span className={`material-icons-outlined mr-3 transition-colors ${active ? 'text-primary' : 'text-gray-500 group-hover:text-gray-300'}`}>
       {icon}
@@ -167,7 +165,7 @@ interface ParticipantProps {
 export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender, school, condition, status, uuid_participante, img, gradient, onDownloadPdf }) => (
   <div className="bg-surface-dark rounded-xl border border-gray-800 shadow-sm hover:border-primary/50 transition-all duration-300 group flex flex-col h-full overflow-hidden">
     <div className={`relative h-24 bg-gradient-to-r ${gradient}`}>
-      <div className={`absolute top-3 right-3 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] font-bold uppercase border ${status === 'Activo' ? 'bg-green-500/20 text-primary border-primary/30' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'}`}>
+      <div className={`absolute top-3 right-3 backdrop-blur-sm rounded-full px-2 py-0.5 text-[10px] font-bold uppercase border ${status === 'Activo' ? 'bg-black text-primary border-primary/30' : 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'}`}>
         {status}
       </div>
     </div>
@@ -200,7 +198,7 @@ export const ParticipantCard: React.FC<ParticipantProps> = ({ name, age, gender,
       <Link to={`/athletes/detail/${uuid_participante}`} className="w-full py-2 bg-primary hover:bg-emerald-600 text-black font-bold rounded text-xs uppercase transition-colors justify-center items-center text-center">
         Ver Detalles
       </Link>
-      <button 
+      <button
         onClick={async () => {
           const result = await Swal.fire({
             title: '¿Generar carnet?',
@@ -235,7 +233,7 @@ interface InfoCardProps {
   extraHeader?: React.ReactNode;
 }
 
-export const InfoCard: React.FC<InfoCardProps> = ({ title, icon, children, headerColor = "bg-zinc-900/50", accentBar, extraHeader }) => (
+export const InfoCard: React.FC<InfoCardProps> = ({ title, icon, children, headerColor = "bg-primary-900/50", accentBar, extraHeader }) => (
   <div className="bg-surface-dark shadow-lg rounded-2xl overflow-hidden border border-gray-800 relative">
     {accentBar && <div className="absolute top-0 left-0 w-1 h-full bg-secondary shadow-[0_0_10px_#ef4444]"></div>}
     <div className={`px-6 py-4 border-b border-gray-800 flex items-center justify-between ${headerColor}`}>
@@ -324,7 +322,7 @@ export const IconButton = ({ icon, onClick, className = "", title, variant = "ne
     neutral: "text-gray-400 hover:text-white hover:bg-gray-800 border-transparent",
   };
   return (
-    <button 
+    <button
       onClick={onClick}
       title={title}
       className={`p-2 rounded-lg border transition-all duration-200 flex items-center justify-center ${variants[variant]} ${className}`}
@@ -346,7 +344,7 @@ export const Modal: React.FC<{
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div 
+      <div
         className={`bg-surface-dark border border-gray-800 rounded-2xl w-full overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -355,7 +353,7 @@ export const Modal: React.FC<{
             <span className="w-1 h-5 bg-primary rounded-full"></span>
             {title}
           </h3>
-          <button 
+          <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"
           >
