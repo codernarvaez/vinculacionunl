@@ -15,6 +15,8 @@ const SectionDivider = ({ title }: { title: string }) => (
     </div>
 );
 
+import TurnstileWidget from "../../components/TurnstileWidget";
+
 interface IRegisterForm {
     nombres: string;
     apellidos: string;
@@ -25,6 +27,7 @@ interface IRegisterForm {
     clave: string;
     clave_confirm: string;
     acepto_terminos: boolean;
+    cloudflare_token: string;
 }
 
 const initialValue: IRegisterForm = {
@@ -37,6 +40,7 @@ const initialValue: IRegisterForm = {
     clave: "",
     clave_confirm: "",
     acepto_terminos: false,
+    cloudflare_token: "",
 };
 
 
@@ -52,6 +56,7 @@ const registerForm = yup.object({
         .oneOf([yup.ref('clave')], 'Las contraseñas no coinciden')
         .required("Confirma tu contraseña"),
     acepto_terminos: yup.boolean().required("Debes aceptar la política de privacidad").oneOf([true], "Debes aceptar la política de privacidad"),
+    cloudflare_token: yup.string().required("Captcha obligatorio")
 }).required();
 
 
@@ -225,10 +230,15 @@ const Register: React.FC = () => {
                             </div>
 
 
+                            <TurnstileWidget onVerify={(token: string) => form.setValue('cloudflare_token', token, { shouldValidate: true })} />
+                            {form.formState.errors.cloudflare_token && (
+                                <p className="text-red-500 text-xs text-center">{form.formState.errors.cloudflare_token.message}</p>
+                            )}
 
                             <PrimaryButton type="submit">
                                 Completar Registro
                             </PrimaryButton>
+
 
                             <div className="text-end">
                                 <p className="text-sm text-gray-400">

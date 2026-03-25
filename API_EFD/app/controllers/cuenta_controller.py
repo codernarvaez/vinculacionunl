@@ -7,13 +7,18 @@ from app.services.cuenta_service import cuenta_service
 from app.schemas.cuenta_schema import login_request, login_response, cuenta_estado_update, cuenta_rol_update
 from app.schemas.response_schema import api_response
 from app.models.cuenta import Cuenta
+from app.utils.captcha import verify_turnstile_token
+
 class cuenta_controller:
 
     router = APIRouter(prefix="/cuentas", tags=["Cuentas"])
 
     @router.post("/login", response_model=api_response[login_response], status_code=status.HTTP_200_OK)
-    def login(response: Response, login_data: login_request, db: Session = Depends(get_db)):
+    async def login(response: Response, login_data: login_request, db: Session = Depends(get_db)):
         try:
+            # Verify Cloudflare Turnstile Captcha
+            await verify_turnstile_token(login_data.cloudflare_token)
+            
             resultado = cuenta_service.login(response, db, login_data.correo, login_data.clave)
             return api_response(
                 code=status.HTTP_200_OK,

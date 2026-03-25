@@ -9,14 +9,18 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
 
+import TurnstileWidget from '../../components/TurnstileWidget';
+
 interface IInitialValue {
     correo: string;
     clave: string;
+    cloudflare_token: string;
 }
 
 const initialValues: IInitialValue = {
     correo: "",
     clave: "",
+    cloudflare_token: "",
 };
 
 interface LoginResponse {
@@ -34,10 +38,11 @@ const Login: React.FC = () => {
 
     const loginSchema = yup.object({
         correo: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
-        clave: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres").max(50, "La contraseña no debe exceder los 50 caracteres").required("La contraseña es obligatoria")
+        clave: yup.string().min(6, "La contraseña debe tener al menos 6 caracteres").max(50, "La contraseña no debe exceder los 50 caracteres").required("La contraseña es obligatoria"),
+        cloudflare_token: yup.string().required("Validación de captcha obligatoria")
     });
 
-    const form = useForm({
+    const form = useForm<IInitialValue>({
         defaultValues: initialValues,
         resolver: yupResolver(loginSchema)
     });
@@ -138,8 +143,14 @@ const Login: React.FC = () => {
                                 </div>
                             </div>
 
+                            <TurnstileWidget onVerify={(token) => form.setValue('cloudflare_token', token, { shouldValidate: true })} />
+                            {form.formState.errors.cloudflare_token && (
+                                <p className="text-red-500 text-xs text-center">{form.formState.errors.cloudflare_token.message}</p>
+                            )}
+
                             <PrimaryButton type="submit">Ingresar</PrimaryButton>
                         </form>
+
 
                     </div>
 

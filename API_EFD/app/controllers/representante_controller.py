@@ -8,13 +8,18 @@ from ..services.representante_service import represenante_service
 from ..schemas.response_schema import api_response
 from app.services.cuenta_service import cuenta_service
 
+from ..utils.captcha import verify_turnstile_token
+
 class representante_controller:
     router = APIRouter(prefix="/representantes", tags=["Representantes"])
 
     #enpoint para crear un representante y su cuenta asociada
     @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[RepresentanteResponse])
-    def crear_representante(representante_data: representante_request, db: Session = Depends(get_db)):
+    async def crear_representante(representante_data: representante_request, db: Session = Depends(get_db)):
         try:
+            # Verify Cloudflare Turnstile Captcha
+            await verify_turnstile_token(representante_data.cloudflare_token)
+            
             nuevo_representante = represenante_service.crear_representante(db, representante_data)
             return api_response(code=status.HTTP_201_CREATED, 
                                 msg="Representante creado exitosamente", 

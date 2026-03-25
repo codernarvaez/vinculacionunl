@@ -5,6 +5,7 @@ from app.schemas.rol_schema import RolResponse
 class login_request(BaseModel):
     correo: EmailStr
     clave: str
+    cloudflare_token: str
 
 class CuentaResponse(BaseModel):
     uuid: str
