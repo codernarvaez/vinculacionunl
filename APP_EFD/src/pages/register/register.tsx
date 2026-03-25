@@ -25,8 +25,6 @@ interface IRegisterForm {
     clave: string;
     clave_confirm: string;
     acepto_terminos: boolean;
-    acepto_privacidad: boolean;
-    acepto_imagen: boolean;
 }
 
 const initialValue: IRegisterForm = {
@@ -39,8 +37,6 @@ const initialValue: IRegisterForm = {
     clave: "",
     clave_confirm: "",
     acepto_terminos: false,
-    acepto_privacidad: false,
-    acepto_imagen: false,
 };
 
 
@@ -55,9 +51,7 @@ const registerForm = yup.object({
     clave_confirm: yup.string()
         .oneOf([yup.ref('clave')], 'Las contraseñas no coinciden')
         .required("Confirma tu contraseña"),
-    acepto_terminos: yup.boolean().required("Debes aceptar los términos").oneOf([true], "Debes aceptar los términos"),
-    acepto_privacidad: yup.boolean().required("Debes aceptar la política de privacidad").oneOf([true], "Debes aceptar la política de privacidad"),
-    acepto_imagen: yup.boolean().required("Debes aceptar el uso de imagen").oneOf([true], "Debes aceptar el uso de imagen"),
+    acepto_terminos: yup.boolean().required("Debes aceptar la política de privacidad").oneOf([true], "Debes aceptar la política de privacidad"),
 }).required();
 
 
@@ -209,55 +203,16 @@ const Register: React.FC = () => {
 
                                 <div className="flex items-center gap-2">
                                     <input
-                                        {...form.register("acepto_privacidad")}
+                                        {...form.register("acepto_terminos")}
                                         type="checkbox"
-                                        id="acepto_privacidad"
+                                        id="acepto_terminos"
                                         className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary focus:ring-offset-gray-900 transition-colors cursor-pointer"
                                     />
-                                    <label htmlFor="acepto_privacidad" className="text-xs text-gray-400 cursor-pointer select-none">
+                                    <label htmlFor="acepto_terminos" className="text-xs text-gray-400 cursor-pointer select-none">
                                         Acepto la <span className="text-white">Política de Privacidad</span> y el tratamiento de mis datos personales según la LOPDP.
                                     </label>
                                     <Link to="/politica-privacidad" target="_blank" className="text-xs text-primary hover:underline ml-auto font-medium shrink-0">
                                         Leer política
-                                    </Link>
-                                </div>
-
-                                {form.formState.errors.acepto_privacidad && (
-                                    <p className="text-[10px] text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
-                                        {form.formState.errors.acepto_privacidad.message}
-                                    </p>
-                                )}
-
-                                <div className="flex items-center gap-2 mt-2">
-                                    <input
-                                        {...form.register("acepto_imagen")}
-                                        type="checkbox"
-                                        id="acepto_imagen"
-                                        className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary focus:ring-offset-gray-900 transition-colors cursor-pointer"
-                                    />
-                                    <label htmlFor="acepto_imagen" className="text-xs text-gray-400 cursor-pointer select-none">
-                                        Autorizo el uso de mi <span className="text-white">imagen (fotografías/videos)</span> para fines institucionales deportivos.
-                                    </label>
-                                </div>
-
-                                {form.formState.errors.acepto_imagen && (
-                                    <p className="text-[10px] text-red-500 font-medium animate-in fade-in slide-in-from-top-1">
-                                        {form.formState.errors.acepto_imagen.message}
-                                    </p>
-                                )}
-
-                                <div className="flex items-center gap-2 mt-2">
-                                    <input
-                                        {...form.register("acepto_terminos")}
-                                        type="checkbox"
-                                        id="acepto_terminos"
-                                        className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary focus:ring-offset-gray-900 transition-colors"
-                                    />
-                                    <label htmlFor="acepto_terminos" className="text-xs text-gray-400 cursor-pointer select-none">
-                                        Acepto los <span className="text-white">términos y condiciones</span> de la UNL.
-                                    </label>
-                                    <Link to="#" className="text-xs text-primary hover:underline ml-auto font-medium">
-                                        Leer términos
                                     </Link>
                                 </div>
 
@@ -266,6 +221,7 @@ const Register: React.FC = () => {
                                         {form.formState.errors.acepto_terminos.message}
                                     </p>
                                 )}
+
                             </div>
 
 

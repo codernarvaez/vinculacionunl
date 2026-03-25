@@ -12,7 +12,7 @@ import SchoolsService from '../../../services/schools';
 import type { IEscuela } from '../../../services/schools';
 import { getUUIDCurrentUser } from '../../../services/auth';
 import { getNamesCurrentUser } from '../../../services/auth';
-import { jsPDF } from 'jspdf';
+
 interface IFormValues {
   nombres: string;
   apellidos: string;
@@ -23,7 +23,6 @@ interface IFormValues {
   condicionMedica: string | null;
   foto: File | null;
   aceptoTerminos: boolean;
-  aceptoPrivacidad: boolean;
   aceptoImagen: boolean;
   aceptoAsentimiento?: boolean;
 }
@@ -38,7 +37,6 @@ const initialValues: IFormValues = {
   condicionMedica: "",
   foto: null,
   aceptoTerminos: false,
-  aceptoPrivacidad: false,
   aceptoImagen: false,
   aceptoAsentimiento: false
 };
@@ -70,24 +68,23 @@ const ParticipantRegister: React.FC = () => {
       .default(null),
     foto: yup.mixed<File>().required("La foto es obligatoria"),
     aceptoTerminos: yup.boolean().oneOf([true], "Debe aceptar los términos").required(),
-    aceptoPrivacidad: yup.boolean().oneOf([true], "Debe aceptar la política de privacidad").required(),
-    aceptoImagen: yup.boolean().required(),
+    aceptoImagen: yup.boolean().oneOf([true], "Debe aceptar el uso de su imagen").required(),
     aceptoAsentimiento: yup.boolean().when('fechaNac', (fechaNac, schema) => {
-        if (!fechaNac) return schema;
-        const fn = Array.isArray(fechaNac) ? fechaNac[0] : (fechaNac as any);
-        if (fn) {
-           const parsedFn = new Date(fn);
-           const today = new Date();
-           let age = today.getFullYear() - parsedFn.getFullYear();
-           const m = today.getMonth() - parsedFn.getMonth();
-           if (m < 0 || (m === 0 && today.getDate() < parsedFn.getDate())) {
-               age--;
-           }
-           if (age >= 12 && age <= 17) {
-               return schema.oneOf([true], "El menor debe dar su asentimiento").required("El menor debe asentir");
-           }
+      if (!fechaNac) return schema;
+      const fn = Array.isArray(fechaNac) ? fechaNac[0] : (fechaNac as any);
+      if (fn) {
+        const parsedFn = new Date(fn);
+        const today = new Date();
+        let age = today.getFullYear() - parsedFn.getFullYear();
+        const m = today.getMonth() - parsedFn.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < parsedFn.getDate())) {
+          age--;
         }
-        return schema.notRequired();
+        if (age >= 12 && age <= 17) {
+          return schema.oneOf([true], "El menor debe dar su asentimiento").required("El menor debe asentir");
+        }
+      }
+      return schema.notRequired();
     })
   });
 
@@ -174,54 +171,11 @@ const ParticipantRegister: React.FC = () => {
         formData.append('foto', data.foto);
       }
 
-      // Generar PDF del Consentimiento Informado
-      try {
-        const doc = new jsPDF();
-        
-        doc.setFontSize(14);
-        doc.text("CONSENTIMIENTO INFORMADO PARA REPRESENTANTES LEGALES", 105, 20, { align: "center" });
-        doc.setFontSize(10);
-        doc.text("Escuelas de Formación Deportiva – Universidad Nacional de Loja (UNL)", 105, 28, { align: "center" });
-        
-        doc.setFontSize(10);
-        const text1 = "1. Información General\nLa Universidad Nacional de Loja, a través de sus Escuelas de Formación Deportiva, busca no solo el desarrollo físico de sus estudiantes, sino también la generación de conocimiento técnico y científico que mejore los procesos de entrenamiento. Por ello, solicitamos su autorización para el tratamiento de los datos de su representado(a).\n\n2. ¿Qué datos recolectamos y para qué?\nAl firmar este documento, usted autoriza la recopilación y tratamiento de:\n- Datos de Identidad: Nombres, apellidos, fecha de nacimiento y número de cédula del menor y su representante.\n- Datos de Salud y Antropometría: Peso, talla, índice de masa corporal, historial de lesiones y condiciones médicas preexistentes.\n- Datos de Rendimiento: Resultados de pruebas físicas, técnicas y tácticas durante los entrenamientos y competencias.\n- Registro Audiovisual: Fotografías y videos de las actividades deportivas con fines de análisis técnico, registro institucional o promoción de las escuelas.";
-        
-        const splitText1 = doc.splitTextToSize(text1, 180);
-        doc.text(splitText1, 15, 40);
-
-        const currentY = doc.getTextDimensions(splitText1).h + 45;
-
-        const text2 = `DECLARACIÓN DE ACEPTACIÓN\n\nYo, ${getNamesCurrentUser() || 'Representante'}, en mi calidad de Padre / Madre / Tutor Legal del menor ${data.nombres} ${data.apellidos}, declaro que:\n- He leído y comprendido la finalidad del tratamiento de los datos.\n- Autorizo libremente el uso de la información y registros de mi representado para los fines deportivos y académicos de la Universidad Nacional de Loja.`;
-        const splitText2 = doc.splitTextToSize(text2, 180);
-        doc.text(splitText2, 15, currentY);
-
-        doc.text("Firma del Representante: _______________________", 15, currentY + 40);
-        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 150, currentY + 40);
-
-        // Si es mayor de 12 se agrega sección de Asentimiento
-        const parsedFn = new Date(fechaFormateada);
-        let age = new Date().getFullYear() - parsedFn.getFullYear();
-        if (new Date().getMonth() - parsedFn.getMonth() < 0 || (new Date().getMonth() - parsedFn.getMonth() === 0 && new Date().getDate() < parsedFn.getDate())) {
-            age--;
-        }
-        if (age >= 12 && age <= 17) {
-            doc.addPage();
-            doc.setFontSize(14);
-            doc.text("ASENTIMIENTO PARA NIÑOS / ADOLESCENTES", 105, 20, { align: "center" });
-            doc.setFontSize(10);
-            const text3 = `Yo, ${data.nombres} ${data.apellidos}, de ${age} años de edad, entiendo que la UNL va a recolectar datos sobre mis entrenamientos, peso, talla, y podría tomar mis fotografías/videos.\nAl marcar SÍ, acepto participar en este seguimiento.`;
-            const splitText3 = doc.splitTextToSize(text3, 180);
-            doc.text(splitText3, 15, 40);
-            doc.text(`Deportista: _______________________\nFecha: ${new Date().toLocaleDateString()}`, 15, 80);
-        }
-
-        // Save PDF and maybe open it
-        doc.save(`Consentimiento_${data.nombres}_${data.apellidos}.pdf`);
-      } catch (e) {
-        console.error("No se pudo generar el PDF", e);
-      }
+      // Se eliminó la generación automática del PDF de consentimiento/asentimiento a petición del usuario.
+      // Ahora se puede descargar desde la página de detalles del participante.
 
       const response = await methodPOST('/participantes', formData);
+
       if (response.code === 201) {
         toast.success("Participante registrado exitosamente", {
           description: "Redirigiendo al panel de representantes..."
@@ -363,28 +317,6 @@ const ParticipantRegister: React.FC = () => {
 
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <div className={`bg-black/40 p-4 rounded-lg flex items-start gap-3 border ${form.formState.errors.aceptoPrivacidad ? 'border-red-500/50' : 'border-gray-800'}`}>
-                  <input
-                    {...form.register('aceptoPrivacidad')}
-                    type="checkbox"
-                    id="privacidad"
-                    className="mt-1 rounded border-gray-700 bg-gray-900 text-primary focus:ring-primary w-4 h-4 cursor-pointer"
-                  />
-                  <label htmlFor="privacidad" className="text-xs text-gray-400 leading-relaxed cursor-pointer">
-                    Acepto la Política de Privacidad y el tratamiento de mis datos personales según la LOPDP.
-                  </label>
-                  <Link to="/politica-privacidad" target="_blank" className="text-xs text-primary hover:underline ml-auto font-medium shrink-0">
-                    Leer política
-                  </Link>
-                </div>
-                {form.formState.errors.aceptoPrivacidad && (
-                  <span className="text-[10px] text-red-500 font-bold tracking-wider ml-1">
-                    {form.formState.errors.aceptoPrivacidad.message}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex flex-col gap-2">
                 <div className={`bg-black/40 p-4 rounded-lg flex items-start gap-3 border ${form.formState.errors.aceptoImagen ? 'border-red-500/50' : 'border-gray-800'}`}>
                   <input
                     {...form.register('aceptoImagen')}
@@ -395,6 +327,9 @@ const ParticipantRegister: React.FC = () => {
                   <label htmlFor="imagen" className="text-xs text-gray-400 leading-relaxed cursor-pointer">
                     Autorizo el uso de mi imagen (fotografías/videos) para fines institucionales deportivos.
                   </label>
+                  {form.formState.errors.aceptoImagen && (
+                    <p className="text-red-500 text-xs">{form.formState.errors.aceptoImagen.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -404,7 +339,7 @@ const ParticipantRegister: React.FC = () => {
                 let age = today.getFullYear() - parsedFn.getFullYear();
                 const m = today.getMonth() - parsedFn.getMonth();
                 if (m < 0 || (m === 0 && today.getDate() < parsedFn.getDate())) {
-                    age--;
+                  age--;
                 }
                 if (age >= 12 && age <= 17) {
                   return (

@@ -7,6 +7,8 @@ import { toast } from 'sonner';
 import { API_URL } from '../../../api/access';
 import { generateAthletePdf } from '../../../utils/pdfGenerator';
 
+import AssentPdfButton from '../../../components/athletes/AssentPdfButton';
+
 const ParticipantDetail: React.FC = () => {
   const { uuid } = useParams<{ uuid: string }>();
   const navigate = useNavigate();
@@ -111,8 +113,10 @@ const ParticipantDetail: React.FC = () => {
                 <span className="material-icons-round text-base mr-2">picture_as_pdf</span>
                 Descargar Carnet
               </PrimaryButton>
+              <AssentPdfButton athlete={athlete} />
             </div>
           </div>
+
 
           {/* Columna Derecha: Datos */}
           <div className="lg:col-span-8 space-y-6">
