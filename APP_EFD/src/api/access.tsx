@@ -1,4 +1,5 @@
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { useAuthStore } from '../store/authStore';
 /**
  * Helper para peticiones HTTP con tipado genérico
  * @template T El tipo de dato que esperamos recibir (Response)
@@ -24,6 +25,9 @@ export async function methodGET<T>(endpoint: string): Promise<T> {
         },
     });
     if (!response.ok) {
+        if (response.status === 401) {
+            useAuthStore.getState().logout();
+        }
         const errorData: ApiError = await response.json();
         throw new Error(errorData.detail || `Error GET: ${response.statusText}`);
     }
@@ -48,6 +52,9 @@ export async function methodPOST<T, D = unknown>(endpoint: string, data: D): Pro
     console.log("Response from POST:", result);
 
     if (!response.ok) {
+        if (response.status === 401) {
+            useAuthStore.getState().logout();
+        }
         const errorData: ApiError = result;
         if (Array.isArray(errorData.detail)) {
             const messages = errorData.detail.map((err: any) => `${err.loc.join('.')}: ${err.msg}`).join(', ');
@@ -68,6 +75,9 @@ export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Prom
         body: isFormData ? (data as unknown as BodyInit) : JSON.stringify(data),
     });
     if (!response.ok) {
+        if (response.status === 401) {
+            useAuthStore.getState().logout();
+        }
         const errorData: ApiError = await response.json();
         throw new Error(errorData.detail || `Error PUT: ${response.statusText}`);
     }
@@ -83,6 +93,9 @@ export async function methodDELETE<T>(endpoint: string): Promise<T> {
         },
     });
     if (!response.ok) {
+        if (response.status === 401) {
+            useAuthStore.getState().logout();
+        }
         const errorData: ApiError = await response.json();
         throw new Error(errorData.detail || `Error DELETE: ${response.statusText}`);
     }

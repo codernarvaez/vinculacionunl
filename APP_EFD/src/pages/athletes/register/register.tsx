@@ -378,7 +378,7 @@ const ParticipantRegister: React.FC = () => {
                   <label htmlFor="consent" className="text-xs text-gray-400 leading-relaxed cursor-pointer">
                     Certifico que la información es verídica y acepto los términos y condiciones de las Escuelas de Formación UNL.
                   </label>
-                  <Link to="#" className="text-xs text-primary hover:underline ml-auto font-medium shrink-0">
+                  <Link to="/politica-privacidad" target="_blank" className="text-xs text-primary hover:underline ml-auto font-medium shrink-0">
                     Leer términos
                   </Link>
                 </div>
