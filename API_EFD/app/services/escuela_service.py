@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import asc
 from app.models.escuela import Escuela
 from app.models.administrador import Administrador
 from datetime import date
@@ -37,10 +38,13 @@ class escuela_service:
             print(f"Log del error: {e}")
             raise e
     
-    #ordenar por nombre para que siempre salga una detras de otra y edad menor a mayor
     def listar_escuelas_disponibles(db: Session):
         try:
-            escuelas = db.query(Escuela).filter(Escuela.estado == True).order_by(Escuela.ranInferior, Escuela.ranSuperior).all()
+            escuelas = db.query(Escuela).filter(Escuela.estado == True)\
+                .order_by(
+                    asc(Escuela.nombre), 
+                    asc(Escuela.ranInferior)
+                ).all()
             return escuelas
         except Exception as e:
             print(f"Log del error: {e}")
@@ -103,8 +107,11 @@ class escuela_service:
 
     def listar_escuelas(db: Session):
         try:
-            items = db.query(Escuela).all()
-            return items
+            escuelas = db.query(Escuela).order_by(
+                asc(Escuela.nombre), 
+                asc(Escuela.ranInferior)
+            ).all()
+            return escuelas
         except Exception as e:
             print(f"Log del error: {e}")
             

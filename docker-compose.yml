@@ -11,6 +11,7 @@ services:
       - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-sql:/docker-entrypoint-initdb.d/
 
   api:
     build:
@@ -19,6 +20,9 @@ services:
     restart: always
     depends_on:
       - db
+    volumes:
+      - ./API_EFD:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       - DB_HOST=db
       - DB_USER=admin
@@ -39,11 +43,15 @@ services:
     restart: always
     depends_on:
       - api
+    volumes:
+      - ./APP_EFD:/app
+      - /app/node_modules 
+    command: npm run dev -- --host
     environment:
       - VITE_API_URL=http://localhost:8000
       - VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
     ports:
-      - "80:80"
+      - "5173:5173"
 
 volumes:
   postgres_data:
