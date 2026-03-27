@@ -178,15 +178,15 @@ const Register: React.FC = () => {
                     {/* Columna del Formulario */}
                     <div className="lg:col-span-3 p-8 sm:p-10">
                         <div className="mb-6">
-                            <h1 className="text-2xl font-bold text-white">Crear Cuenta</h1>
+                            <h1 className="text-2xl font-bold text-white">Crear Cuenta del Representante</h1>
                             <p className="text-gray-400 text-sm">Formulario para representantes legales de los deportistas</p>
                         </div>
 
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <SectionDivider title="Datos de Identidad" />
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <InputField {...form.register("nombres")} error={form.formState.errors.nombres?.message} label="Nombres" id="nombres" icon="badge" placeholder="Ej. Juan Pérez" />
-                                <InputField {...form.register("apellidos")} error={form.formState.errors.apellidos?.message} label="Apellidos" id="apellidos" icon="badge" placeholder="Ej. Gómez" />
+                                <InputField {...form.register("nombres")} error={form.formState.errors.nombres?.message} label="Nombres" id="nombres" icon="badge" placeholder="Ej. Juan Pablo" />
+                                <InputField {...form.register("apellidos")} error={form.formState.errors.apellidos?.message} label="Apellidos" id="apellidos" icon="badge" placeholder="Ej. Gómez Cuenca" />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

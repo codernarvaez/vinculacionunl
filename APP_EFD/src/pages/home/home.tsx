@@ -87,8 +87,8 @@ const Home: React.FC = () => {
         <div className="relative z-10 animate-fade-in group">
           <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full mix-blend-screen pointer-events-none group-hover:bg-primary/30 transition-all duration-700"></div>
           <div className="relative bg-surface-dark rounded-2xl aspect-[4/3] overflow-hidden shadow-2xl border border-white/5 flex items-center justify-center transform transition-transform group-hover:scale-[1.02] duration-500">
-            <img src="https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&q=80&w=1200" alt="Atletas entrenando" className="w-full h-full object-cover opacity-90" />
-            <div className="absolute inset-0 bg-gradient-to-tr from-background-dark/80 via-background-dark/20 to-transparent"></div>
+            <img src="/portada.jpeg" alt="Atletas entrenando" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-background-dark/40 via-background-dark/20 to-transparent"></div>
             {/* Decorative Sport Icons */}
             <div className="absolute bottom-6 right-6 flex gap-4">
               <div className="w-12 h-12 bg-primary text-black rounded-full flex items-center justify-center shadow-lg transform rotate-12 group-hover:rotate-0 transition-transform">
@@ -109,8 +109,9 @@ const Home: React.FC = () => {
             <div>
               <h2 className="text-3xl md:text-5xl font-black mb-6">Nuestra <span className="text-primary">Misión</span></h2>
               <p className="text-gray-400 text-lg leading-relaxed">
-                Transformar la cultura física de Loja mediante la promoción de hábitos de vida activa,
-                mejorando el bienestar integral y el desarrollo físico-motriz de nuestra comunidad.
+                Fomentar estilos de vida activos y saludables en la ciudad de Loja, a través de la planificación e implementación de programas de actividad física,
+                deportiva y recreativa dirigidos a niños y adolescentes, contribuyendo a mejorar la calidad de vida, bienestar
+                integral y desarrollo físico-cognitivo-motriz, fortaleciendo el vínculo entre la Universidad y la sociedad.
               </p>
             </div>
 
@@ -131,7 +132,7 @@ const Home: React.FC = () => {
                 </div>
                 <div>
                   <h4 className="font-bold text-white uppercase tracking-tight text-sm">Visión de Impacto</h4>
-                  <p className="text-gray-400 text-sm mt-1">Generar un impacto perdurable reduciendo el sedentarismo y el uso excesivo de tecnologías.</p>
+                  <p className="text-gray-400 text-sm mt-1">Generar un impacto sostenible reduciendo el sedentarismo y el uso excesivo de tecnologías.</p>
                 </div>
               </div>
 
@@ -169,14 +170,14 @@ const Home: React.FC = () => {
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-4">Objetivos <span className="text-primary">Estratégicos</span></h2>
           <p className="text-gray-400 max-w-3xl mx-auto text-lg">
-            Fomentar la actividad física, deportiva y recreativa a través de formación,
-            actividades físico-recreativas y jornadas competitivas para la comunidad de Loja y la UNL.
+            Promover la actividad física, deportiva y recreativa para mejorar la calidad de vida de niños y adolescentes, mediante
+            programas de formación deportiva, actividades físico-recreativas y jornadas competitivas para la comunidad de Loja y la UNL.
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { icon: 'groups', title: 'Organización', desc: 'Ejecutar eventos periódicos para estudiantes, docentes y trabajadores.' },
+            { icon: 'groups', title: 'Organización', desc: 'Ejecutar eventos periódicos y permanentes para estudiantes, docentes y trabajadores.' },
             { icon: 'school', title: 'Formación', desc: 'Desarrollar escuelas de iniciación deportiva respetando las fases sensibles.' },
             { icon: 'terminal', title: 'Innovación', desc: 'Implementar una plataforma para gestión y evaluación de programas.' },
             { icon: 'analytics', title: 'Evaluación', desc: 'Medir el rendimiento físico-motriz y desarrollo motor periódicamente.' },
@@ -344,7 +345,11 @@ const Home: React.FC = () => {
                       <p className="text-gray-200 text-sm font-bold">Lic. Hamilton Sanmartín, Mg. Sc.</p>
                       <a href="mailto:hamilton.sanmartin@unl.edu.ec" className="text-primary text-xs hover:underline flex items-center gap-1 mt-1">
                         <span className="material-icons-outlined text-xs">email</span>
-                        hamilton.sanmartin@unl.edu.ec
+                        hamilto.sanmartin@unl.edu.ec
+                      </a>
+                      <a href="tel:+593969680450" className="text-primary text-xs hover:underline flex items-center gap-1 mt-1">
+                        <span className="material-icons-outlined text-xs">phone</span>
+                        0969680450
                       </a>
                     </div>
                   </div>

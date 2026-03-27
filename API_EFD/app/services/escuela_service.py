@@ -37,15 +37,15 @@ class escuela_service:
             print(f"Log del error: {e}")
             raise e
     
+    #ordenar por nombre para que siempre salga una detras de otra y edad menor a mayor
     def listar_escuelas_disponibles(db: Session):
         try:
-            escuelas = db.query(Escuela).filter(Escuela.estado == True).all()
+            escuelas = db.query(Escuela).filter(Escuela.estado == True).order_by(Escuela.ranInferior, Escuela.ranSuperior).all()
             return escuelas
         except Exception as e:
             print(f"Log del error: {e}")
             raise e
     
-    #listar escuelas disponibles en base a una fecha de nacimiento
     def listar_escuelas_por_fecha_nacimiento(db: Session, fecha_nac):
         try:
             edad_participante = (date.today() - fecha_nac).days // 365

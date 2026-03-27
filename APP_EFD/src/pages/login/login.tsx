@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { InputField, PrimaryButton } from '../components/UI';
 // import { Link } from 'react-router-dom';
 import * as yup from "yup";
@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
 
 import TurnstileWidget from '../../components/TurnstileWidget';
+import { ForgotPasswordModal } from './ForgotPasswordModal';
 
 interface IInitialValue {
     correo: string;
@@ -35,6 +36,7 @@ interface LoginResponse {
 const Login: React.FC = () => {
 
     const navigate = useNavigate();
+    const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
 
     const loginSchema = yup.object({
         correo: yup.string().email("Ingresa un correo válido").required("El correo es obligatorio"),
@@ -137,9 +139,13 @@ const Login: React.FC = () => {
                                     placeholder="••••••••"
                                 />
                                 <div className="flex justify-end mt-5">
-                                    <a href="#" className="text-xs text-secondary hover:text-red-400 transition-colors font-medium">
+                                    <button 
+                                        type="button"
+                                        onClick={() => setIsForgotModalOpen(true)}
+                                        className="text-xs text-secondary hover:text-red-400 transition-colors font-medium bg-transparent border-none cursor-pointer"
+                                    >
                                         ¿Olvidaste tu clave?
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
 
@@ -161,6 +167,11 @@ const Login: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <ForgotPasswordModal 
+                isOpen={isForgotModalOpen} 
+                onClose={() => setIsForgotModalOpen(false)} 
+            />
         </div>
     );
 };

@@ -6,9 +6,12 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from ..models.cuenta import Cuenta
 from ..core.security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES, SECRET_KEY, ALGORITHM
-from ..utils.utils import verify_password
+from ..utils.utils import verify_password, hash_password
 from ..core.get_db import get_db
 from ..schemas.cuenta_schema import token_data
+from ..utils.email_sender import send_reset_code_email
+import random
+
 class cuenta_service:
 
 
@@ -110,3 +113,62 @@ class cuenta_service:
                 )
             return current_user
         return role_verifier
+
+    @staticmethod
+    def solicitar_recuperacion(db: Session, correo: str):
+        cuenta = db.query(Cuenta).filter(Cuenta.correo == correo).first()
+        if not cuenta:
+            return {"msg": "Si el correo está registrado, recibirás un código"}
+
+        codigo = f"{random.randint(100000, 999999)}"
+        cuenta.codigo_recuperacion = codigo
+        cuenta.codigo_expiracion = datetime.now() + timedelta(minutes=10)
+        
+        db.commit()
+        
+        send_reset_code_email(correo, codigo)
+        
+        return {"msg": "Código enviado exitosamente"}
+
+    @staticmethod
+    def verificar_codigo(db: Session, correo: str, codigo: str):
+        cuenta = db.query(Cuenta).filter(
+            Cuenta.correo == correo,
+            Cuenta.codigo_recuperacion == codigo
+        ).first()
+        
+        if not cuenta:
+            raise HTTPException(status_code=400, detail="Código inválido")
+            
+        if datetime.now() > cuenta.codigo_expiracion:
+            raise HTTPException(status_code=400, detail="El código ha expirado")
+            
+        return {"msg": "Código válido"}
+
+    @staticmethod
+    def restablecer_clave(db: Session, correo: str, codigo: str, nueva_clave: str):
+        # Validar longitud
+        if len(nueva_clave) < 8 or len(nueva_clave) > 25:
+            raise HTTPException(status_code=400, detail="La contraseña debe tener entre 8 y 25 caracteres")
+
+        cuenta = db.query(Cuenta).filter(
+            Cuenta.correo == correo,
+            Cuenta.codigo_recuperacion == codigo
+        ).first()
+        
+        if not cuenta:
+            raise HTTPException(status_code=400, detail="Código inválido")
+            
+        if datetime.now() > cuenta.codigo_expiracion:
+            raise HTTPException(status_code=400, detail="El código ha expirado")
+            
+        # Actualizar clave
+        cuenta.clave = hash_password(nueva_clave)
+        
+        # Limpiar campos de recuperación
+        cuenta.codigo_recuperacion = None
+        cuenta.codigo_expiracion = None
+        
+        db.commit()
+        
+        return {"msg": "Contraseña restablecida exitosamente"}

@@ -36,3 +36,16 @@ class cuenta_estado_update(BaseModel):
 
 class cuenta_rol_update(BaseModel):
     rol_uuid: str
+
+# Schemas para recuperación de contraseña
+class RecuperacionRequest(BaseModel):
+    correo: EmailStr
+
+class VerificarCodigoRequest(BaseModel):
+    correo: EmailStr
+    codigo: str
+
+class RestablecerClaveRequest(BaseModel):
+    correo: EmailStr
+    codigo: str
+    nueva_clave: str

@@ -4,7 +4,7 @@ from app.core.get_db import get_db
 from app.core.security import get_current_user
 from uuid import UUID
 from app.services.cuenta_service import cuenta_service
-from app.schemas.cuenta_schema import login_request, login_response, cuenta_estado_update, cuenta_rol_update
+from app.schemas.cuenta_schema import login_request, login_response, cuenta_estado_update, cuenta_rol_update, RecuperacionRequest, VerificarCodigoRequest, RestablecerClaveRequest
 from app.schemas.response_schema import api_response
 from app.models.cuenta import Cuenta
 from app.utils.captcha import verify_turnstile_token
@@ -64,6 +64,46 @@ class cuenta_controller:
             return api_response(
                 code=status.HTTP_200_OK,
                 msg="Rol de cuenta actualizado exitosamente",
+                data=None
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.post("/recuperacion/solicitar", response_model=api_response[dict], status_code=status.HTTP_200_OK)
+    def solicitar_recuperacion(data: RecuperacionRequest, db: Session = Depends(get_db)):
+        try:
+            resultado = cuenta_service.solicitar_recuperacion(db, data.correo)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg=resultado["msg"],
+                data=None
+            )
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.post("/recuperacion/verificar", response_model=api_response[dict], status_code=status.HTTP_200_OK)
+    def verificar_codigo(data: VerificarCodigoRequest, db: Session = Depends(get_db)):
+        try:
+            resultado = cuenta_service.verificar_codigo(db, data.correo, data.codigo)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg=resultado["msg"],
+                data=None
+            )
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
+
+    @router.post("/recuperacion/restablecer", response_model=api_response[dict], status_code=status.HTTP_200_OK)
+    def restablecer_clave(data: RestablecerClaveRequest, db: Session = Depends(get_db)):
+        try:
+            resultado = cuenta_service.restablecer_clave(db, data.correo, data.codigo, data.nueva_clave)
+            return api_response(
+                code=status.HTTP_200_OK,
+                msg=resultado["msg"],
                 data=None
             )
         except HTTPException as e:
