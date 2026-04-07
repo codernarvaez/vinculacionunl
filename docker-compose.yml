@@ -13,6 +13,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-sql:/docker-entrypoint-initdb.d/
+    networks:
+      - efd_network
 
   api:
     build:
@@ -33,6 +35,8 @@ services:
       - TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
     ports:
       - "8001:8001"
+    networks:
+      - efd_network
 
   app:
     build:
@@ -46,6 +50,12 @@ services:
       - VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
     ports:
       - "9091:80"
+    networks:
+      - efd_network
+
+networks:
+  efd_network:
+    driver: bridge
 
 volumes:
   postgres_data:
