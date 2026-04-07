@@ -1,9 +1,37 @@
 @import "tailwindcss";
 
 :root {
-  /* Default dark scheme as base */
+  /* --- DEFAULT LIGHT THEME --- */
+  --app-primary: #D90429;
+  /* Deep Crimson */
+  --app-secondary: #000;
+  /* Black */
+  --app-surface: #ffffff;
+  /* Clean white for cards */
+  --app-background: #F8F9FA;
+  /* Ghost White */
+  --app-text: #2B2D42;
+  /* Space Blue */
+  --app-input: #ffffff;
+  --app-border: #e5e7eb;
+  /* gray-200 eq */
+  --app-btn-text: #ffffff;
+  /* White text for buttons */
+  --app-bg-black: #f3f4f6;
+  --app-text-muted: #6b7280;
+  /* text-gray-500 eq */
+  --app-text-muted-darker: #4b5563;
+  --app-text-lighter: #2B2D42;
+
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  /* --- DARK SCHEME OVERRIDE --- */
   --app-primary: #10B981;
+  /* Emerald */
   --app-secondary: #EF4444;
+  /* Red */
   --app-surface: #18181b;
   --app-background: #0f0f0f;
   --app-text: #f3f4f6;
@@ -15,35 +43,8 @@
   --app-text-muted-darker: #6b7280;
   --app-text-lighter: #d1d5db;
   /* gray-300 eq */
-  color-scheme: dark;
-}
 
-:root[data-theme="light"] {
-  /* Light scheme based on user requirements */
-  --app-primary: #D90429;
-  /* Emerald Deep */
-  --app-secondary: #000;
-  /* Deep Crimson */
-  --app-surface: #ffffff;
-  /* Clean white for cards */
-  --app-background: #F8F9FA;
-  /* Ghost White */
-  --app-text: #2B2D42;
-  /* Space Blue */
-  --app-input: #ffffff;
-  --app-border: #e5e7eb;
-  /* gray-200 eq */
-  --app-btn-text: #ffffff;
-  /* White text for buttons on dark green */
-  --app-bg-black: #f3f4f6;
-  /* bg-black map for light mode backgrounds */
-  --app-text-muted: #6b7280;
-  /* text-gray-500 eq */
-  --app-text-muted-darker: #4b5563;
-  /* text-gray-600 eq */
-  --app-text-lighter: #2B2D42;
-  /* Space Blue eq */
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 @theme {
