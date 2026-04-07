@@ -46,7 +46,7 @@ services:
     depends_on:
       - api
     environment:
-      - VITE_API_URL=http://localhost:8001
+      - VITE_API_URL=https://activate.unl.edu.ec/api
       - VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
     ports:
       - "9091:80"

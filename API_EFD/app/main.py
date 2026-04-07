@@ -36,7 +36,9 @@ class CORSStaticFiles(StaticFiles):
 origins = [
     "http://localhost:9091",
     "http://127.0.0.1:9091",
-    "http://localhost:5173"
+    "http://localhost:5173",
+    "https://activate.unl.edu.ec",
+    "https://activate.unl.edu.ec/"
 ]
 
 app.add_middleware(
