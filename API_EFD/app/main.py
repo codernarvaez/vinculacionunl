@@ -34,10 +34,8 @@ class CORSStaticFiles(StaticFiles):
         return response
 
 origins = [
-    "http://localhost",
-    "http://localhost:80",
-    "http://127.0.0.1",
-    "http://127.0.0.1:80",
+    "http://localhost:9091",
+    "http://127.0.0.1:9091",
     "http://localhost:5173"
 ]
 
