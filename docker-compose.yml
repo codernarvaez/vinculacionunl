@@ -31,7 +31,7 @@ services:
       - ACCESS_TOKEN_EXPIRE_MINUTES=120
       - TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
     ports:
-      - "8000:8000"
+      - "8001:8001"
 
   app:
     build:
@@ -41,7 +41,7 @@ services:
     depends_on:
       - api
     environment:
-      - VITE_API_URL=http://localhost:8000
+      - VITE_API_URL=http://localhost:8001
       - VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
     ports:
       - "80:80"
