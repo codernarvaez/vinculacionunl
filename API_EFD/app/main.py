@@ -10,7 +10,6 @@ from app.controllers.persona_controller import persona_controller
 from app.controllers.rol_controller import rol_controller
 from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
-from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 Base.metadata.create_all(bind=engine)
 
@@ -49,7 +48,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(ProxyHeadersMiddleware, trusted_proxies="*")
 
 app.mount("/public", StaticFiles(directory="public"), name="public")
 #TODO revisar antes de subir a producción, restringir orígenes permitidos
