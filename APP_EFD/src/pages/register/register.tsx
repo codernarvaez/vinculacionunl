@@ -94,7 +94,7 @@ const Register: React.FC = () => {
         if (!result.isConfirmed) return;
 
         try {
-            const response = await methodPOST<RegisterResponse, IRegisterForm>('/representantes/', data);
+            const response = await methodPOST<RegisterResponse, IRegisterForm>('/representantes', data);
             console.log(response.msg);
 
             if (response.code === 201 && response.data) {

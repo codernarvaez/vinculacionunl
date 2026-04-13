@@ -59,7 +59,7 @@ const AdminService = {
 
     createAdministrator: async (data: CreateAdminData): Promise<boolean> => {
         try {
-            await methodPOST('/administradores/', data);
+            await methodPOST('/administradores', data);
             return true;
         } catch (error) {
             console.error("Error creating administrator:", error);

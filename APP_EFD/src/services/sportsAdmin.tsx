@@ -11,7 +11,7 @@ const SportsAdminService = {
     // --- Athletes Management ---
     getAllAthletes: async (skip: number = 0, limit: number = 100, q: string = '', escuela_uuid: string = ''): Promise<PaginatedResponse<IAthletes>> => {
         try {
-            let queryUrl = `/participantes/?skip=${skip}&limit=${limit}`;
+            let queryUrl = `/participantes?skip=${skip}&limit=${limit}`;
             if (q) queryUrl += `&q=${encodeURIComponent(q)}`;
             if (escuela_uuid) queryUrl += `&escuela_uuid=${encodeURIComponent(escuela_uuid)}`;
 

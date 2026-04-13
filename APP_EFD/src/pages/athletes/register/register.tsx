@@ -174,7 +174,7 @@ const ParticipantRegister: React.FC = () => {
       // Se eliminó la generación automática del PDF de consentimiento/asentimiento a petición del usuario.
       // Ahora se puede descargar desde la página de detalles del participante.
 
-      const response = await methodPOST('/participantes/', formData);
+      const response = await methodPOST('/participantes', formData);
 
       if (response.code === 201) {
         toast.success("Participante registrado exitosamente", {
