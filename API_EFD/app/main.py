@@ -10,7 +10,7 @@ from app.controllers.persona_controller import persona_controller
 from app.controllers.rol_controller import rol_controller
 from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
-
+from fastapi.middleware.proxy_headers import ProxyHeadersMiddleware
 
 Base.metadata.create_all(bind=engine)
 
@@ -49,6 +49,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(ProxyHeadersMiddleware, trusted_proxies="*")
+
 app.mount("/public", StaticFiles(directory="public"), name="public")
 #TODO revisar antes de subir a producción, restringir orígenes permitidos
 
@@ -68,4 +70,4 @@ app.include_router(rol_controller.router)
 def run():
     import uvicorn
 
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8001, reload=True)
+    uvicorn.run("app.main:app", port=8000, reload=True)

@@ -116,7 +116,7 @@ class cuenta_controller:
         response.delete_cookie(
             key="access_token",
             httponly=True,
-            secure=False,
-            samesite="lax"
+            secure=True,
+            samesite="none"
         )
         return {"msg": "Sesión cerrada correctamente"}
