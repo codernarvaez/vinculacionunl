@@ -70,7 +70,7 @@ class SchoolsService {
 
     static async createSchool(schoolData: any): Promise<any> {
         try {
-            const response = await methodPOST<ApiResponse<IEscuela>>('/escuelas', schoolData);
+            const response = await methodPOST<ApiResponse<IEscuela>>('/escuelas/', schoolData);
             console.log(response)
             return response.data || [];
         } catch (error) {
