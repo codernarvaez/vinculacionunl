@@ -7,7 +7,7 @@ from app.schemas.response_schema import api_response
 class administrador_controller:
     router = APIRouter(prefix="/administradores", tags=["Administradores"])
 
-    @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[administrador_response])
+    @router.post("", status_code=status.HTTP_201_CREATED, response_model=api_response[administrador_response])
     def crear_administrador(administrador_data: administrador_request, db: Session = Depends(get_db)):
         try:
            nuevo_administrador = administrador_service.crear_administrador(db, administrador_data)

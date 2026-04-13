@@ -14,7 +14,7 @@ class representante_controller:
     router = APIRouter(prefix="/representantes", tags=["Representantes"])
 
     #enpoint para crear un representante y su cuenta asociada
-    @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[RepresentanteResponse])
+    @router.post("", status_code=status.HTTP_201_CREATED, response_model=api_response[RepresentanteResponse])
     async def crear_representante(representante_data: representante_request, db: Session = Depends(get_db)):
         try:
             # Verify Cloudflare Turnstile Captcha

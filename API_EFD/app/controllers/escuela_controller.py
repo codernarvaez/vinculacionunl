@@ -11,7 +11,7 @@ from datetime import date
 class escuela_controller:
     router = APIRouter(prefix="/escuelas", tags=["Escuelas"])
     
-    @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[escuela_response])
+    @router.post("", status_code=status.HTTP_201_CREATED, response_model=api_response[escuela_response])
     def crear_escuela(escuela_data: escuela_request, db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.RoleChecker(["gestor", "administrador"]))):
         try:
             nueva_escuela = escuela_service.crear_escuela(db, escuela_data)
@@ -82,7 +82,7 @@ class escuela_controller:
         except Exception as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error en el servidor: {str(e)}")
 
-    @router.get("/", response_model=api_response[list[escuela_response]], status_code=status.HTTP_200_OK)
+    @router.get("", response_model=api_response[list[escuela_response]], status_code=status.HTTP_200_OK)
     def listar_escuelas(db: Session = Depends(get_db), current_user: Cuenta = Depends(cuenta_service.get_current_user)):
         try:
             resultado = escuela_service.listar_escuelas(db)

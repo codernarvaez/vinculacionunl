@@ -15,7 +15,7 @@ from app.models.cuenta import Cuenta
 class participante_controller:
     router = APIRouter(prefix="/participantes", tags=["Participantes"])
 
-    @router.post("/", status_code=status.HTTP_201_CREATED, response_model=api_response[participante_response])
+    @router.post("", status_code=status.HTTP_201_CREATED, response_model=api_response[participante_response])
     def inscribir_participante_a_escuela(
         nombres: str = Form(...),
         apellidos: str = Form(...),
