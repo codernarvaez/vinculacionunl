@@ -10,7 +10,7 @@ from app.controllers.persona_controller import persona_controller
 from app.controllers.rol_controller import rol_controller
 from app.models import administrador, representante, escuela, participante, rol, cuenta, persona
 from app.config.database import engine, Base
-from fastapi.middleware.proxy_headers import ProxyHeadersMiddleware
+from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 Base.metadata.create_all(bind=engine)
 

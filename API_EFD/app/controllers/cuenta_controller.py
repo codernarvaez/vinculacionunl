@@ -119,4 +119,5 @@ class cuenta_controller:
             secure=True,
             samesite="none"
         )
+        response.headers["Clear-Site-Data"] = '"cache", "cookies", "storage"'
         return {"msg": "Sesión cerrada correctamente"}
