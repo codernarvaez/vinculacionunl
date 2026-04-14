@@ -4,7 +4,7 @@ import { InputField, PrimaryButton } from '../components/UI';
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { methodPOST } from '../../api/access';
+import { methodPOST, ApiRequestError } from '../../api/access';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useAuthStore } from '../../store/authStore';
@@ -79,7 +79,17 @@ const Login: React.FC = () => {
             }
 
         } catch (error: unknown) {
-            if (error instanceof Error) {
+            if (error instanceof ApiRequestError) {
+                if (error.status === 401) {
+                    toast.error("No autorizado", {
+                        description: error.message
+                    });
+                } else {
+                    toast.error("Error al iniciar sesión", {
+                        description: error.message
+                    });
+                }
+            } else if (error instanceof Error) {
                 toast.error("Error al iniciar sesión", {
                     description: error.message
                 });
