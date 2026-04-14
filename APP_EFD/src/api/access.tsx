@@ -13,7 +13,16 @@ export interface ApiResponse<T = unknown> {
 }
 
 export interface ApiError {
-    detail: string;
+    detail: string | any[];
+}
+
+export class ApiRequestError extends Error {
+    status: number;
+    constructor(message: string, status: number) {
+        super(message);
+        this.status = status;
+        this.name = 'ApiRequestError';
+    }
 }
 
 export async function methodGET<T>(endpoint: string): Promise<T> {
@@ -29,7 +38,8 @@ export async function methodGET<T>(endpoint: string): Promise<T> {
             useAuthStore.getState().logout();
         }
         const errorData: ApiError = await response.json();
-        throw new Error(errorData.detail || `Error GET: ${response.statusText}`);
+        const errorMessage = typeof errorData.detail === 'string' ? errorData.detail : `Error GET: ${response.statusText}`;
+        throw new ApiRequestError(errorMessage, response.status);
     }
     return response.json();
 }
@@ -58,9 +68,10 @@ export async function methodPOST<T, D = unknown>(endpoint: string, data: D): Pro
         const errorData: ApiError = result;
         if (Array.isArray(errorData.detail)) {
             const messages = errorData.detail.map((err: any) => `${err.loc.join('.')}: ${err.msg}`).join(', ');
-            throw new Error(messages);
+            throw new ApiRequestError(messages, response.status);
         }
-        throw new Error(errorData.detail || `Error POST: ${response.statusText}`);
+        const errorMessage = typeof errorData.detail === 'string' ? errorData.detail : `Error POST: ${response.statusText}`;
+        throw new ApiRequestError(errorMessage, response.status);
     }
     return result as ApiResponse<T>;
 }
@@ -79,7 +90,8 @@ export async function methodPUT<T, D = unknown>(endpoint: string, data: D): Prom
             useAuthStore.getState().logout();
         }
         const errorData: ApiError = await response.json();
-        throw new Error(errorData.detail || `Error PUT: ${response.statusText}`);
+        const errorMessage = typeof errorData.detail === 'string' ? errorData.detail : `Error PUT: ${response.statusText}`;
+        throw new ApiRequestError(errorMessage, response.status);
     }
     return response.json();
 }
@@ -97,7 +109,8 @@ export async function methodDELETE<T>(endpoint: string): Promise<T> {
             useAuthStore.getState().logout();
         }
         const errorData: ApiError = await response.json();
-        throw new Error(errorData.detail || `Error DELETE: ${response.statusText}`);
+        const errorMessage = typeof errorData.detail === 'string' ? errorData.detail : `Error DELETE: ${response.statusText}`;
+        throw new ApiRequestError(errorMessage, response.status);
     }
     return response.json();
 }
