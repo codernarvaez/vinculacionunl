@@ -90,7 +90,7 @@ const Login: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background-dark text-white font-body">
+        <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-background-dark text-white font-body px-4">
 
             <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
 
@@ -99,10 +99,10 @@ const Login: React.FC = () => {
                 <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-secondary/10 rounded-full blur-[120px]"></div>
             </div>
 
-            <div className="relative z-10 w-full max-w-md p-6">
+            <div className="relative z-10 w-full max-w-md p-4 sm:p-6">
                 {/* Logo Sección */}
                 <div className="text-center mb-8">
-                    <h1 className="font-display text-5xl font-bold tracking-wider uppercase">
+                    <h1 className="font-display text-3xl sm:text-5xl font-bold tracking-wider uppercase">
                         Actívate <span className="text-primary">UNL</span>
                     </h1>
                     <div className="h-1 w-20 bg-secondary mx-auto mt-2"></div>
@@ -112,8 +112,8 @@ const Login: React.FC = () => {
                 <div className="bg-surface-dark border border-gray-800 rounded-lg shadow-2xl overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-secondary via-primary to-secondary"></div>
 
-                    <div className="p-8">
-                        <h2 className="text-3xl font-bold font-display uppercase mb-8 text-center tracking-widest">
+                    <div className="p-5 sm:p-8">
+                        <h2 className="text-xl sm:text-3xl font-bold font-display uppercase mb-6 sm:mb-8 text-center tracking-widest">
                             Iniciar Sesión
                         </h2>
 

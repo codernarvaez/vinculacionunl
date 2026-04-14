@@ -38,7 +38,7 @@ export const InputField: React.FC<InputProps & { error?: string }> = ({ label, i
 export const PrimaryButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }> = ({ children, className = "", ...props }) => (
   <button
     {...props}
-    className={`w-full flex justify-center py-3 px-4 rounded shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] text-xl font-display font-semibold text-black bg-primary hover:bg-emerald-400 transition-all duration-300 transform hover:-translate-y-0.5 tracking-wide uppercase ${className}`}
+    className={`w-full flex justify-center py-3 px-4 rounded shadow-lg shadow-primary/40 text-xl font-display font-semibold text-pure-white bg-primary hover:opacity-90 transition-all duration-300 transform hover:-translate-y-0.5 tracking-wide uppercase ${className}`}
   >
     {children}
   </button>
@@ -47,7 +47,7 @@ export const PrimaryButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElemen
 export const DangerButton: React.FC<React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string }> = ({ children, className = "", ...props }) => (
   <button
     {...props}
-    className={`px-6 py-2.5 rounded border border-red-500 text-red-500 font-bold uppercase text-xs hover:bg-red-500 hover:text-white transition-all active:scale-95 ${className}`}
+    className={`px-6 py-2.5 rounded border border-red-500 text-red-500 font-bold uppercase text-xs hover:bg-red-500 hover:text-pure-white transition-all active:scale-95 ${className}`}
   >
     {children}
   </button>

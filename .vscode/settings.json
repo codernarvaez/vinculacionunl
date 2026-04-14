@@ -1,0 +1,12 @@
+{
+  // Suprime advertencias del validador CSS nativo de VS Code sobre at-rules de Tailwind CSS v4
+  // @plugin y @theme son directivas válidas de Tailwind v4, no errores reales.
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+
+  // Recomendado: usa la extensión "Tailwind CSS IntelliSense" para soporte completo
+  // https://marketplace.visualstudio.com/items?itemName=bradlc.vscode-tailwindcss
+  "editor.quickSuggestions": {
+    "strings": "on"
+  }
+}

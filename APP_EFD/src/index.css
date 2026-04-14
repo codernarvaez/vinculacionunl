@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
 
 :root {
   /* --- DEFAULT LIGHT THEME --- */
@@ -54,9 +55,15 @@
   --color-background-dark: var(--app-background);
   --color-input-dark: var(--app-input);
 
-  --color-white: var(--app-text);
-  --color-black: var(--app-btn-text);
+  /* ✅ Tokens propios sin pisar white/black nativos de Tailwind */
+  --color-app-text: var(--app-text);
+  --color-app-btn-text: var(--app-btn-text);
 
+  /* Helpers puros de visibilidad absoluta */
+  --color-pure-white: #ffffff;
+  --color-pure-black: #000000;
+
+  /* Grises del sistema redirigidos a variables de tema */
   --color-gray-800: var(--app-border);
   --color-gray-700: var(--app-border);
   --color-gray-900: var(--app-input);
@@ -66,6 +73,11 @@
 
   --color-gray-300: var(--app-text-lighter);
   --color-gray-200: var(--app-text-lighter);
+
+  /* Tipografía global: Montserrat */
+  --font-sans: 'Montserrat', sans-serif;
+  --font-display: 'Montserrat', sans-serif;
+  --font-body: 'Montserrat', sans-serif;
 }
 
 body {

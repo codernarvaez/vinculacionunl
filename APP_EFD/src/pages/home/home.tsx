@@ -26,7 +26,7 @@ const Home: React.FC = () => {
       <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
 
       {/* Navigation */}
-      <nav className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto backdrop-blur-sm sticky top-0 z-50">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-6 max-w-7xl mx-auto backdrop-blur-sm sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <div className="text-primary text-3xl flex items-center justify-center">
             <span className="material-icons-outlined">sports_soccer</span>
@@ -45,25 +45,25 @@ const Home: React.FC = () => {
           <a href="#contactanos" className="hover:text-white transition-colors duration-200">Contactanos</a>
         </div>
 
-        <div className="flex gap-4 items-center">
-          <Link to="/login" className="text-gray-300 hover:text-white font-bold px-4 py-2 text-sm transition-colors hidden sm:block">
+        <div className="flex gap-2 sm:gap-4 items-center">
+          <Link to="/login" className="text-gray-300 hover:text-white font-bold px-3 sm:px-4 py-2 text-sm transition-colors hidden sm:block">
             Iniciar Sesión
           </Link>
-          <Link to="/register" className="bg-primary text-black font-bold px-6 py-2.5 rounded hover:bg-opacity-90 transition-all duration-300 text-sm shadow-lg shadow-primary/30 transform hover:-translate-y-0.5">
+          <Link to="/register" className="bg-primary text-black font-bold px-4 sm:px-6 py-2 sm:py-2.5 rounded hover:bg-opacity-90 transition-all duration-300 text-sm shadow-lg shadow-primary/30 transform hover:-translate-y-0.5">
             Registrarse
           </Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main id="inicio" className="max-w-7xl mx-auto px-8 pt-16 pb-24 grid md:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6 z-10">
+      <main id="inicio" className="max-w-7xl mx-auto px-4 sm:px-8 pt-10 sm:pt-16 pb-16 sm:pb-24 grid md:grid-cols-2 gap-8 sm:gap-12 items-center">
+        <div className="space-y-5 sm:space-y-6 z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 w-max mb-2">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
             <span className="text-primary text-[10px] font-bold tracking-widest uppercase">Inscripciones Abiertas</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black leading-[1.05] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black leading-[1.05] tracking-tight">
             Escuelas de <br />
             <span className="text-primary line-clamp-2 pb-2">Formación Deportiva</span>
           </h1>
@@ -103,7 +103,7 @@ const Home: React.FC = () => {
       </main>
 
       {/* Sección 1: Misión (Introducción y Justificación) */}
-      <section id="mision" className="max-w-7xl mx-auto px-8 pb-32">
+      <section id="mision" className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-8">
             <div>
@@ -166,7 +166,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Sección 2: Objetivos */}
-      <section id="objetivos" className="max-w-7xl mx-auto px-8 pb-32">
+      <section id="objetivos" className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-black mb-4">Objetivos <span className="text-primary">Estratégicos</span></h2>
           <p className="text-gray-400 max-w-3xl mx-auto text-lg">
@@ -193,12 +193,12 @@ const Home: React.FC = () => {
       </section>
 
       {/* Sección 3: Calendario de Actividades */}
-      <section id="calendario" className="max-w-7xl mx-auto px-8 pb-32">
-        <div className="bg-surface-dark border border-white/5 rounded-[2.5rem] p-12 relative overflow-hidden">
+      <section id="calendario" className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
+        <div className="bg-surface-dark border border-white/5 rounded-[2rem] sm:rounded-[2.5rem] p-6 sm:p-12 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-[100px] -mr-48 -mt-48"></div>
 
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-5xl font-black mb-12">Calendario de <span className="text-primary">Actividades</span></h2>
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-8 sm:mb-12">Calendario de <span className="text-primary">Actividades</span></h2>
 
             <div className="grid md:grid-cols-2 gap-12">
               <div className="space-y-8">
@@ -268,7 +268,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Escuelas Section */}
-      <section id="escuelas" className="max-w-7xl mx-auto px-8 pb-32">
+      <section id="escuelas" className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-5xl font-black mb-4">Nuestras <span className="text-primary">Escuelas</span></h2>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -318,7 +318,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Sección 4: Contáctanos & Información Institucional */}
-      <section id="contactanos" className="max-w-7xl mx-auto px-8 pb-32">
+      <section id="contactanos" className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Contact Info */}
           <div className="lg:col-span-2 bg-surface-dark rounded-3xl p-10 border border-white/5 shadow-xl relative overflow-hidden group">
@@ -417,11 +417,11 @@ const Home: React.FC = () => {
       </section>
 
       {/* Final CTA */}
-      <section className="max-w-7xl mx-auto px-8 pb-32">
-        <div className="bg-primary rounded-[2.5rem] p-12 text-center relative overflow-hidden shadow-2xl shadow-primary/20">
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 pb-16 sm:pb-32">
+        <div className="bg-primary rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-12 text-center relative overflow-hidden shadow-2xl shadow-primary/20">
           <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
           <div className="relative z-10 space-y-6">
-            <h2 className="text-4xl md:text-6xl font-black text-black leading-none">¿Listo para empezar?</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-black leading-none">¿Listo para empezar?</h2>
             <p className="text-black/70 text-lg font-medium max-w-xl mx-auto">
               Únete a la mejor comunidad deportiva universitaria y desarrolla tu potencial físico y social.
             </p>
@@ -435,7 +435,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-white/5 py-12 px-8">
+      <footer className="border-t border-white/5 py-8 sm:py-12 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-2">
             <div className="text-primary text-2xl">
