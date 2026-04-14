@@ -1,4 +1,4 @@
-export const API_URL = 'https://activate.unl.edu.ec/api';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 import { useAuthStore } from '../store/authStore';
 /**
  * Helper para peticiones HTTP con tipado genérico

@@ -72,7 +72,7 @@ class AthletesService {
 
     static async getAllAthletes(skip: number = 0, limit: number = 1000): Promise<IAthletes[]> {
         try {
-            const response = await methodGET<ApiResponse<any>>(`/participantes/?skip=${skip}&limit=${limit}`);
+            const response = await methodGET<ApiResponse<any>>(`/participantes?skip=${skip}&limit=${limit}`);
             return response.data?.items || [];
         } catch (error) {
             console.error("Error fetching all athletes:", error);

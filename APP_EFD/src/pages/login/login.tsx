@@ -139,7 +139,7 @@ const Login: React.FC = () => {
                                     placeholder="••••••••"
                                 />
                                 <div className="flex justify-end mt-5">
-                                    <button
+                                    <button 
                                         type="button"
                                         onClick={() => setIsForgotModalOpen(true)}
                                         className="text-xs text-secondary hover:text-red-400 transition-colors font-medium bg-transparent border-none cursor-pointer"
@@ -168,9 +168,9 @@ const Login: React.FC = () => {
                 </div>
             </div>
 
-            <ForgotPasswordModal
-                isOpen={isForgotModalOpen}
-                onClose={() => setIsForgotModalOpen(false)}
+            <ForgotPasswordModal 
+                isOpen={isForgotModalOpen} 
+                onClose={() => setIsForgotModalOpen(false)} 
             />
         </div>
     );
